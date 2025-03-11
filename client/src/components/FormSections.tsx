@@ -309,22 +309,6 @@ const FormSections: React.FC<FormSectionsProps> = ({
     setActiveSuggestionSection(sectionId);
   };
 
-  const acceptSuggestion = (sectionId: string) => {
-    if (suggestions[sectionId]) {
-      updateGigDescription(sectionId, suggestions[sectionId].suggested);
-      clearSuggestion(sectionId);
-    }
-  };
-
-  const clearSuggestion = (sectionId: string) => {
-    setSuggestions(prev => {
-      const newSuggestions = {...prev};
-      delete newSuggestions[sectionId];
-      return newSuggestions;
-    });
-    setActiveSuggestionSection(null);
-  };
-
   const toggleOptionalSection = (sectionId: string) => {
     setActiveSections(prev =>
       prev.includes(sectionId)
@@ -481,25 +465,6 @@ const FormSections: React.FC<FormSectionsProps> = ({
                         </div>
                       </div>
                     )}
-                    
-                    {activeSuggestionSection === section.id && (
-                      <div className="absolute top-0 right-0 flex items-center space-x-1 z-10 bg-white shadow-md p-1 rounded-bl">
-                        <button 
-                          onClick={() => clearSuggestion(section.id)}
-                          className="text-gray-600 hover:text-gray-800 text-xs flex items-center p-1 rounded hover:bg-gray-100"
-                        >
-                          <X size={14} className="text-red-500" />
-                          <span className="sr-only">Dismiss</span>
-                        </button>
-                        <button 
-                          onClick={() => acceptSuggestion(section.id)}
-                          className="text-blue-700 hover:bg-blue-100 p-1 rounded text-xs flex items-center"
-                        >
-                          <Check size={14} />
-                          <span className="sr-only">Apply</span>
-                        </button>
-                      </div>
-                    )}
                   </div>
                 ) : (
                   <div className="relative">
@@ -519,7 +484,7 @@ const FormSections: React.FC<FormSectionsProps> = ({
                     />
                     {suggestions[section.id] && (
                       <div className="absolute inset-0 pointer-events-none">
-                        <div className="px-3 py-2 pr-12 whitespace-normal overflow-hidden break-words">
+                        <div className="px-3 py-2 whitespace-normal overflow-hidden break-words">
                           {/* Display text with granular differences */}
                           {suggestions[section.id]?.differences.map((diff, i) => {
                             if (diff.type === 'deletion') {
@@ -539,25 +504,6 @@ const FormSections: React.FC<FormSectionsProps> = ({
                             }
                           })}
                         </div>
-                      </div>
-                    )}
-                    
-                    {activeSuggestionSection === section.id && (
-                      <div className="absolute top-0 right-0 flex items-center space-x-1 z-10 bg-white shadow-md p-1 rounded-bl">
-                        <button 
-                          onClick={() => clearSuggestion(section.id)}
-                          className="text-gray-600 hover:text-gray-800 text-xs flex items-center p-1 rounded hover:bg-gray-100"
-                        >
-                          <X size={14} className="text-red-500" />
-                          <span className="sr-only">Dismiss</span>
-                        </button>
-                        <button 
-                          onClick={() => acceptSuggestion(section.id)}
-                          className="text-blue-700 hover:bg-blue-100 p-1 rounded text-xs flex items-center"
-                        >
-                          <Check size={14} />
-                          <span className="sr-only">Apply</span>
-                        </button>
                       </div>
                     )}
                   </div>
@@ -582,8 +528,6 @@ const FormSections: React.FC<FormSectionsProps> = ({
                   }}
                   gigDescription={gigDescription}
                   onChangesCalculated={(suggestedText) => handleSuggestionReceived(section.id, suggestedText)}
-                  acceptSuggestion={acceptSuggestion}
-                  clearSuggestion={clearSuggestion}
                 />
               </>
             )}

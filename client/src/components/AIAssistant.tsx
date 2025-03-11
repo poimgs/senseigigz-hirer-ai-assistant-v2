@@ -10,8 +10,6 @@ interface AIAssistantProps {
   onSuggestionShown?: () => void;
   gigDescription?: Record<string, string>;
   onChangesCalculated?: (suggestedText: string, changes: { added: string[], removed: string[] }) => void;
-  acceptSuggestion?: (sectionId: string) => void;
-  clearSuggestion?: (sectionId: string) => void;
 }
 
 // API service for OpenAI interactions
@@ -83,8 +81,6 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
   onSuggestionShown,
   gigDescription = {},
   onChangesCalculated,
-  acceptSuggestion,
-  clearSuggestion
 }) => {
   const [suggestionData, setSuggestionData] = useState<SuggestionData | null>(null);
   const [showSuggestion, setShowSuggestion] = useState(false);
@@ -175,23 +171,13 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
 
   const handleAcceptSuggestion = () => {
     if (suggestionData) {
-      if (acceptSuggestion && section) {
-        acceptSuggestion(section);
-        setShowSuggestion(false);
-      } else {
-        updateContent(suggestionData.suggested_update);
-        setShowSuggestion(false);
-      }
+      updateContent(suggestionData.suggested_update);
+      setShowSuggestion(false);
     }
   };
 
   const handleDismissSuggestion = () => {
-    if (clearSuggestion && section) {
-      clearSuggestion(section);
-      setShowSuggestion(false);
-    } else {
-      setShowSuggestion(false);
-    }
+    setShowSuggestion(false);
   };
 
   if (loading) {
