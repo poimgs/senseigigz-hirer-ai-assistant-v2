@@ -1,23 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Sparkles, Briefcase, HelpCircle } from 'lucide-react';
+import { Send, Sparkles, HelpCircle } from 'lucide-react';
+import { GigDescription } from '../types/gig';
 
 interface ChatInterfaceProps {
-  gigDescription: {
-    title: string;
-    summary: string;
-    companyBackground: string;
-    deliverables: string;
-    responsibilities: string;
-    successCriteria: string;
-    skills: string;
-    budget: string;
-    timeline: string;
-    communication: string;
-    ownership: string;
-    confidentiality: string;
-    notes: string;
-  };
-  updateGigDescription: (section: string, value: string) => void;
+  gigDescription: GigDescription;
+  updateGigDescription: (section: keyof GigDescription, value: string) => void;
 }
 
 type MessageType = {

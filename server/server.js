@@ -2,8 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
 
 // Load environment variables
 dotenv.config();
@@ -65,8 +63,6 @@ The gig description has the following sections:
 - Summary: A concise overview of the project
 - Company Background: Context about the company and industry
 - Deliverables: Tangible outputs expected from the freelancer
-- Key Responsibilities: Main tasks the freelancer will handle
-- Success Criteria: How project success will be determined
 - Required Skills: Technical skills and relevant experience required
 - Budget: Budget range and payment terms
 - Timeline: Project schedule and key milestones
@@ -135,8 +131,6 @@ Provide helpful, professional suggestions to improve the gig description. If app
         'summary': 'summary',
         'company background': 'companyBackground',
         'deliverables': 'deliverables',
-        'responsibilities': 'responsibilities',
-        'success criteria': 'successCriteria',
         'skills': 'skills',
         'budget': 'budget',
         'timeline': 'timeline',
