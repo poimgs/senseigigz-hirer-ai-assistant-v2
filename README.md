@@ -13,7 +13,7 @@ Hirer Advisor is a web application that helps users create professional gig desc
 
 - **Frontend**: React, TypeScript, Tailwind CSS, Vite
 - **Backend**: Node.js, Express
-- **AI**: OpenAI API (GPT-4 Turbo)
+- **AI**: OpenAI API (GPT-4o-mini)
 
 ## Project Structure
 
@@ -85,84 +85,11 @@ cd server
 npm start
 ```
 
-## API Endpoints
-
-### POST /api/chat
-Process a conversation with the AI assistant.
-
-**Request Body:**
-```json
-{
-  "messages": [
-    { "id": 1, "sender": "user", "text": "Help me with my job title" }
-  ],
-  "gigDescription": {
-    "title": "",
-    "summary": "",
-    "companyBackground": "",
-    "deliverables": "",
-    "responsibilities": "",
-    "successCriteria": "",
-    "skills": "",
-    "budget": "",
-    "timeline": "",
-    "communication": "",
-    "ownership": "",
-    "confidentiality": "",
-    "notes": ""
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "text": "AI response text",
-  "section": "title",
-  "suggestion": "Suggested content for the section"
-}
-```
-
-### POST /api/improve
-Get AI suggestions to improve a specific section of the gig description.
-
-**Request Body:**
-```json
-{
-  "section": "title",
-  "content": "Current content of the section",
-  "gigDescription": {
-    "title": "Current title",
-    "summary": "Current summary",
-    "companyBackground": "Current company background",
-    "deliverables": "Current deliverables",
-    "responsibilities": "Current responsibilities",
-    "successCriteria": "Current success criteria",
-    "skills": "Current skills",
-    "budget": "Current budget",
-    "timeline": "Current timeline",
-    "communication": "Current communication",
-    "ownership": "Current ownership",
-    "confidentiality": "Current confidentiality",
-    "notes": "Current notes"
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "text": "AI response text",
-  "suggestion": "Improved content for the section"
-}
-```
-
 ## Usage
 
 1. Fill out the gig description form with your project details
-2. Use the AI chat interface to get help with specific sections
-3. Apply AI suggestions to improve your gig description
-4. Export or share your completed gig description
+2. Use the AI chat interface to get help with the overall gig description
+3. Use the AI suggest button to get suggestions for specific sections
 
 ## License
 
