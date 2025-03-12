@@ -1,80 +1,13 @@
+// TODO: Haven't quite looked at this yet
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Sparkles, HelpCircle } from 'lucide-react';
 import { GigDescription } from '../types/gig';
+import apiService, { MessageType } from '../services/apiService';
 
 interface ChatInterfaceProps {
   gigDescription: GigDescription;
   updateGigDescription: (section: keyof GigDescription, value: string) => void;
 }
-
-type MessageType = {
-  id: number;
-  sender: 'user' | 'assistant';
-  text: string;
-  section?: string;
-  suggestion?: string;
-}
-
-// API service for OpenAI interactions
-const apiService = {
-  // Base URL for API calls
-  baseUrl: 'http://localhost:3001/api',
-
-  // Send a message to the chat API
-  async sendMessage(messages: MessageType[], gigDescription: ChatInterfaceProps['gigDescription']) {
-    try {
-      const response = await fetch(`${this.baseUrl}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages,
-          gigDescription,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('API request failed');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error calling chat API:', error);
-      return {
-        text: 'Sorry, I encountered an error. Please try again later.',
-      };
-    }
-  },
-
-  // Get improvement suggestions for a specific section
-  async improveSection(section: string, content: string, gigDescription: ChatInterfaceProps['gigDescription']) {
-    try {
-      const response = await fetch(`${this.baseUrl}/improve`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          section,
-          content,
-          gigDescription,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('API request failed');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error calling improve API:', error);
-      return {
-        text: 'Sorry, I encountered an error. Please try again later.',
-      };
-    }
-  },
-};
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ gigDescription, updateGigDescription }) => {
   const [messages, setMessages] = useState<MessageType[]>([

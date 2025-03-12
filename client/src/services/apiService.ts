@@ -1,14 +1,57 @@
 import { GigDescription } from "../types/gig";
 
+// Define message type for chat interactions
+export type MessageType = {
+  id: number;
+  sender: 'user' | 'assistant';
+  text: string;
+  section?: string;
+  suggestion?: string;
+};
+
 // Define the response type for improve section API
 interface ImproveResponse {
   text: string;
   suggestion: string | null;
 }
 
+// Define the response type for chat API
+interface ChatResponse {
+  text: string;
+  section?: string;
+  suggestion?: string;
+}
+
 const apiService = {
   // Base URL for API calls
   baseUrl: 'http://localhost:3001/api',
+
+  // Send a message to the chat API
+  async sendMessage(messages: MessageType[], gigDescription: GigDescription): Promise<ChatResponse> {
+    try {
+      const response = await fetch(`${this.baseUrl}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages,
+          gigDescription,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error calling chat API:', error);
+      return {
+        text: 'Sorry, I encountered an error. Please try again later.',
+      };
+    }
+  },
 
   // Get improvement suggestions for a specific section
   async improveSection(section: string, content: string, gigDescription: GigDescription): Promise<ImproveResponse> {

@@ -167,7 +167,7 @@ const Section: React.FC<SectionProps> = ({
           </div>
           
           {(loading || suggestion) && (
-            <div className="mt-2">
+            <div className="mt-4">
               <AIAssistant
                 suggestion={suggestion}
                 loading={loading}
