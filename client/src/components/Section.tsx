@@ -18,6 +18,7 @@ interface SectionProps {
   handleAcceptSuggestion: (newContent: string) => void;
   handleDismissSuggestion: () => void;
   generateSuggestion: (section: keyof GigDescription, content: string) => void;
+  hasActiveSuggestion: boolean;
 }
 
 const Section: React.FC<SectionProps> = ({
@@ -31,7 +32,8 @@ const Section: React.FC<SectionProps> = ({
   loading,
   handleAcceptSuggestion,
   handleDismissSuggestion,
-  generateSuggestion
+  generateSuggestion,
+  hasActiveSuggestion
 }) => {
 
   return (
@@ -81,15 +83,15 @@ const Section: React.FC<SectionProps> = ({
           <button
             onClick={() => generateSuggestion(section.id, gigDescription[section.id])}
             className={`group relative p-1.5 rounded-full ${
-              suggestion
+              hasActiveSuggestion
                 ? 'text-gray-300 cursor-not-allowed'
                 : 'text-gray-400 hover:bg-blue-50 hover:text-blue-600'
             } transition-colors`}
-            disabled={!!suggestion}
+            disabled={hasActiveSuggestion}
           >
             <Sparkles size={16} />
             <span className="absolute left-1/2 -translate-x-1/2 -bottom-8 whitespace-nowrap text-sm bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              Suggest
+              {hasActiveSuggestion ? 'Please resolve the current suggestion first' : 'Suggest'}
             </span>
           </button>
           <div className="group relative">

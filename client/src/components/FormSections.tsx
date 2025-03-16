@@ -48,6 +48,9 @@ const FormSections: React.FC<FormSectionsProps> = ({
     );
   };
 
+  // Check if there's any active suggestion
+  const hasActiveSuggestion = Object.values(suggestions).some(suggestion => suggestion !== null);
+
   return (
     <div className="max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Create Your Gig Description</h2>
@@ -68,6 +71,7 @@ const FormSections: React.FC<FormSectionsProps> = ({
             handleAcceptSuggestion={handleAcceptSuggestion}
             handleDismissSuggestion={handleDismissSuggestion}
             generateSuggestion={generateSuggestion}
+            hasActiveSuggestion={hasActiveSuggestion}
           />
         ))}
       </div>
