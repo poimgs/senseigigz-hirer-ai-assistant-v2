@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import Section from './Section';
 import { GigDescription } from '../types/gig';
 import { FormSection } from '../types/form';
-import { requiredSections } from '../data/formSections';
+import { optionalSections, requiredSections } from '../data/formSections';
 import { SuggestionsState } from '../types/suggestion';
+import { Plus, X } from 'lucide-react';
 
 interface FormSectionsProps {
   gigDescription: GigDescription;
@@ -74,6 +75,38 @@ const FormSections: React.FC<FormSectionsProps> = ({
             hasActiveSuggestion={hasActiveSuggestion}
           />
         ))}
+
+        {/* Optional Sections */}
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-700 mb-4">Optional Sections</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {optionalSections.map((section) => (
+              <button
+                key={section.id}
+                onClick={() => toggleOptionalSection(section.id)}
+                 className={`p-4 rounded-lg border-2 transition-all ${
+                   activeSections.includes(section.id)
+                     ? 'border-blue-500 bg-blue-50 text-blue-700'
+                     : 'border-gray-200 hover:border-blue-200 hover:bg-gray-50'
+                 }`}
+               >
+                 <div className="flex items-start justify-between">
+                   <div className="flex-grow text-left">
+                     <h4 className="font-medium mb-1">{section.title}</h4>
+                     <p className="text-sm text-gray-500">{section.description}</p>
+                   </div>
+                   <div className="ml-4">
+                     {activeSections.includes(section.id) ? (
+                       <X size={20} className="text-blue-500" />
+                     ) : (
+                       <Plus size={20} className="text-gray-400" />
+                     )}
+                   </div>
+                 </div>
+               </button>
+             ))}
+           </div>
+         </div>
       </div>
     </div>
   );
