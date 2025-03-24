@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Section from './Section';
 import { GigDescription } from '../types/gig';
 import { FormSection } from '../types/form';
-import { optionalSections, requiredSections } from '../data/formSections';
 import { SuggestionsState } from '../types/suggestion';
 import { Plus, X } from 'lucide-react';
 
@@ -10,8 +9,10 @@ interface FormSectionsProps {
   gigDescription: GigDescription;
   updateGigDescription: (section: keyof GigDescription, value: string) => void;
   expandedSections: string[];
-  setExpandedSections: React.Dispatch<React.SetStateAction<string[]>>;
+  setExpandedSections: (sections: string[]) => void;
+  activeSections: string[];
   sections: FormSection[];
+  toggleOptionalSection: (sectionId: string) => void;
   loading: boolean;
   handleAcceptSuggestion: (newContent: string) => void;
   handleDismissSuggestion: () => void;
@@ -24,31 +25,15 @@ const FormSections: React.FC<FormSectionsProps> = ({
   updateGigDescription,
   expandedSections,
   setExpandedSections,
+  activeSections,
   sections,
+  toggleOptionalSection,
   loading,
   handleAcceptSuggestion,
   handleDismissSuggestion,
   generateSuggestion,
   suggestions,
 }) => {
-  const [activeSections, setActiveSections] = useState<string[]>(requiredSections.map(section => section.id));
-
-  const toggleOptionalSection = (sectionId: string) => {
-    setActiveSections(prev =>
-      prev.includes(sectionId)
-        ? prev.filter(id => id !== sectionId)
-        : [...prev, sectionId]
-    );
-  };
-
-  const toggleSection = (sectionId: string) => {
-    setExpandedSections(prev =>
-      prev.includes(sectionId)
-        ? prev.filter(id => id !== sectionId)
-        : [...prev, sectionId]
-    );
-  };
-
   // Check if there's any active suggestion
   const hasActiveSuggestion = Object.values(suggestions).some(suggestion => suggestion !== null);
 
@@ -65,7 +50,7 @@ const FormSections: React.FC<FormSectionsProps> = ({
             gigDescription={gigDescription}
             updateGigDescription={updateGigDescription}
             expandedSections={expandedSections}
-            toggleSection={toggleSection}
+            setExpandedSections={setExpandedSections}
             toggleOptionalSection={toggleOptionalSection}
             suggestion={suggestions[section.id]}
             loading={loading}
@@ -76,37 +61,37 @@ const FormSections: React.FC<FormSectionsProps> = ({
           />
         ))}
 
-        {/* Optional Sections */}
+        {/* Optional sections */}
         <div className="mt-8 pt-6 border-t border-gray-200">
           <h3 className="text-lg font-semibold text-gray-700 mb-4">Optional Sections</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {optionalSections.map((section) => (
+            {sections.filter(section => !section.required).map((section) => (
               <button
                 key={section.id}
                 onClick={() => toggleOptionalSection(section.id)}
-                 className={`p-4 rounded-lg border-2 transition-all ${
-                   activeSections.includes(section.id)
-                     ? 'border-blue-500 bg-blue-50 text-blue-700'
-                     : 'border-gray-200 hover:border-blue-200 hover:bg-gray-50'
-                 }`}
-               >
-                 <div className="flex items-start justify-between">
-                   <div className="flex-grow text-left">
-                     <h4 className="font-medium mb-1">{section.title}</h4>
-                     <p className="text-sm text-gray-500">{section.description}</p>
-                   </div>
-                   <div className="ml-4">
-                     {activeSections.includes(section.id) ? (
-                       <X size={20} className="text-blue-500" />
-                     ) : (
-                       <Plus size={20} className="text-gray-400" />
-                     )}
-                   </div>
-                 </div>
-               </button>
-             ))}
-           </div>
-         </div>
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  activeSections.includes(section.id)
+                    ? 'border-blue-500 bg-blue-50 text-blue-700'
+                    : 'border-gray-200 hover:border-blue-200 hover:bg-gray-50'
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-grow text-left">
+                    <h4 className="font-medium mb-1">{section.title}</h4>
+                    <p className="text-sm text-gray-500">{section.description}</p>
+                  </div>
+                  <div className="ml-4">
+                    {expandedSections.includes(section.id) ? (
+                      <X size={20} className="text-blue-500" />
+                    ) : (
+                      <Plus size={20} className="text-gray-400" />
+                    )}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

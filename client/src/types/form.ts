@@ -6,8 +6,6 @@ export interface AdditionalInfo {
   example: string;
 }
 
-export type RequiredSectionId = 'title' | 'summary' | 'companyBackground' | 'deliverables' | 'skills' | 'budget' | 'timeline';
-
 export interface FormSection {
   id: keyof GigDescription;
   title: string;
@@ -15,6 +13,7 @@ export interface FormSection {
   description: string;
   example: string;
   textArea?: boolean;
+  required: boolean;
   additionalInfo?: {
     responsibilities?: AdditionalInfo;
     successCriteria?: AdditionalInfo;

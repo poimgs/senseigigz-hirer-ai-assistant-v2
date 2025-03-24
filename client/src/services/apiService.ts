@@ -15,43 +15,9 @@ interface ImproveResponse {
   suggestion: string | null;
 }
 
-// Define the response type for chat API
-interface ChatResponse {
-  text: string;
-  section?: string;
-  suggestion?: string;
-}
-
 const apiService = {
   // Base URL for API calls
-  baseUrl: 'http://localhost:3001/api',
-
-  // Send a message to the chat API
-  async sendMessage(messages: MessageType[], gigDescription: GigDescription): Promise<ChatResponse> {
-    try {
-      const response = await fetch(`${this.baseUrl}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messages,
-          gigDescription,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API request failed with status: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error calling chat API:', error);
-      return {
-        text: 'Sorry, I encountered an error. Please try again later.',
-      };
-    }
-  },
+  baseUrl: 'http://localhost:3002/api',
 
   // Get improvement suggestions for a specific section
   async improveSection(section: string, content: string, gigDescription: GigDescription): Promise<ImproveResponse> {
@@ -79,6 +45,28 @@ const apiService = {
         text: 'Sorry, I encountered an error. Please try again later.',
         suggestion: null,
       };
+    }
+  },
+
+  // Convert plain text to structured gig description
+  async convertTextToGig(text: string): Promise<GigDescription> {
+    try {
+      const response = await fetch(`${this.baseUrl}/convert-text-to-gig`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed with status: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error calling convert-text API:', error);
+      throw error;
     }
   },
 };

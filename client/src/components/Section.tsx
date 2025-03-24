@@ -11,7 +11,7 @@ interface SectionProps {
   gigDescription: GigDescription;
   updateGigDescription: (section: keyof GigDescription, value: string) => void;
   expandedSections: string[];
-  toggleSection: (sectionId: string) => void;
+  setExpandedSections: (sectionIds: string[]) => void;
   toggleOptionalSection: (sectionId: string) => void;
   suggestion: SectionSuggestion | null;
   loading: boolean;
@@ -26,7 +26,7 @@ const Section: React.FC<SectionProps> = ({
   gigDescription,
   updateGigDescription,
   expandedSections,
-  toggleSection,
+  setExpandedSections,
   toggleOptionalSection,
   suggestion,
   loading,
@@ -35,6 +35,13 @@ const Section: React.FC<SectionProps> = ({
   generateSuggestion,
   hasActiveSuggestion
 }) => {
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections(prev =>
+      prev.includes(sectionId)
+        ? prev.filter(id => id !== sectionId)
+        : [...prev, sectionId]
+    );
+  };
 
   return (
     <div
@@ -69,7 +76,7 @@ const Section: React.FC<SectionProps> = ({
           )}
         </button>
         <div className="flex items-center space-x-2">
-          {!isRequiredSection(section.id) && (
+          {!isRequiredSection(section) && (
             <button
               onClick={() => toggleOptionalSection(section.id)}
               className="group relative p-1.5 rounded-full text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
