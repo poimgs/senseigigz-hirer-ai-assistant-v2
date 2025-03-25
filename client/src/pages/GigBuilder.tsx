@@ -99,6 +99,46 @@ function GigBuilder() {
     }
   };
 
+  const handleEnhanceSuggestion = async (section: keyof GigDescription, content: string) => {
+    setLoading(true);
+    try {
+      // Create a copy of gigDescription and clear the content of the target section
+      const gigDescriptionCopy = { ...gigDescription };
+      gigDescriptionCopy[section] = '';
+      
+      const data = await apiService.improveSection(section, content, gigDescriptionCopy, true);
+      let parsedData: SuggestionData | null = null;
+      
+      try {
+        if (typeof data.text === 'string') {
+          parsedData = JSON.parse(data.text);
+        }
+      } catch (e) {
+        console.error('Error parsing JSON response:', e);
+        return;
+      }
+      
+      const suggestedText = parsedData?.suggested_update || data.suggestion || '';
+      const explanation = parsedData?.explanation || 'Enhanced AI-generated suggestion for improving this section.';
+      const differences = findTextDifferences(content, suggestedText);
+      
+      setSuggestionData(prev => ({
+        ...prev,
+        [section]: {
+          suggestedUpdate: suggestedText,
+          explanation: explanation,
+          differences: differences
+        }
+      }));
+      
+      setActiveSuggestionSection(section);
+    } catch (error) {
+      console.error('Error enhancing suggestion:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAcceptSuggestion = (newContent: string) => {
     if (activeSuggestionSection) {
       updateGigDescription(activeSuggestionSection as keyof GigDescription, newContent);
@@ -131,30 +171,27 @@ function GigBuilder() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col relative">
-      <Header />
-      
-      <main className="flex-grow flex relative">
-        <div className="flex-grow p-4 md:p-6 overflow-y-auto">
-          <div className={"transition-all duration-300"}>
-            <FormSections 
-              gigDescription={gigDescription} 
-              updateGigDescription={updateGigDescription}
-              expandedSections={expandedSections}
-              setExpandedSections={setExpandedSections}
-              activeSections={activeSections}
-              setActiveSections={setActiveSections}
-              sections={formSections}
-              loading={loading}
-              handleAcceptSuggestion={handleAcceptSuggestion}
-              handleDismissSuggestion={handleDismissSuggestion}
-              generateSuggestion={generateSuggestion}
-              suggestions={suggestionData}
-              toggleOptionalSection={toggleOptionalSection}
-            />
-          </div>
+    <div className="flex h-screen">    
+      <div className="flex-1 overflow-auto">
+        <Header />
+        <div className="my-4">
+          <FormSections
+            gigDescription={gigDescription}
+            updateGigDescription={updateGigDescription}
+            expandedSections={expandedSections}
+            setExpandedSections={setExpandedSections}
+            activeSections={activeSections}
+            sections={formSections}
+            loading={loading}
+            handleAcceptSuggestion={handleAcceptSuggestion}
+            handleDismissSuggestion={handleDismissSuggestion}
+            generateSuggestion={generateSuggestion}
+            handleEnhanceSuggestion={handleEnhanceSuggestion}
+            suggestions={suggestionData}
+            toggleOptionalSection={toggleOptionalSection}
+          />
         </div>
-      </main>
+      </div>
     </div>
   );
 }

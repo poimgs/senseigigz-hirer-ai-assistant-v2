@@ -18,6 +18,7 @@ interface SectionProps {
   handleAcceptSuggestion: (newContent: string) => void;
   handleDismissSuggestion: () => void;
   generateSuggestion: (section: keyof GigDescription, content: string) => void;
+  handleEnhanceSuggestion: (section: keyof GigDescription, content: string) => void;
   hasActiveSuggestion: boolean;
 }
 
@@ -33,6 +34,7 @@ const Section: React.FC<SectionProps> = ({
   handleAcceptSuggestion,
   handleDismissSuggestion,
   generateSuggestion,
+  handleEnhanceSuggestion,
   hasActiveSuggestion
 }) => {
   const toggleSection = (sectionId: string) => {
@@ -182,6 +184,11 @@ const Section: React.FC<SectionProps> = ({
                 loading={loading}
                 handleAcceptSuggestion={handleAcceptSuggestion}
                 handleDismissSuggestion={handleDismissSuggestion}
+                handleEnhanceSuggestion={
+                  suggestion 
+                    ? (newContent: string) => handleEnhanceSuggestion(section.id, newContent)
+                    : undefined
+                }
               />
             </div>
           )}

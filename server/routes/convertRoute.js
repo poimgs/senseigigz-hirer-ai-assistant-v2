@@ -71,29 +71,33 @@ const gigSchema = {
 
 const createSystemMessage = () => ({
   role: 'system',
-  content: `You are an AI assistant that extracts structured job posting details from user input. Given free-form text describing a project or freelance opportunity, extract and return the following fields:
+  content: `You are an AI assistant that extracts structured job posting information from user-provided text. Your task is to identify and return relevant details in the following fields. If you are unable to find relevant details for the field, return null:
 
 Title – A clear and specific title for the job.
 
-Summary – A concise overview of the project, including its purpose and goals.
+Summary – A concise overview of the project, including its goals and scope.
 
-Company Background – Relevant context about the company and the industry it operates in.
+Company Background – Context about the company and the industry it operates in.
 
 Deliverables – Tangible outputs or outcomes expected from the freelancer.
 
-Required Skills – Technical skills, tools, or prior experience necessary for the role.
+Required Skills – Technical skills, tools, or relevant experience required for the role.
 
-Budget – The budget range, payment terms, or compensation details.
+Budget – Budget range and/or payment terms.
 
-Timeline – The project duration, deadlines, and key milestones.
+Timeline – Project duration, deadlines, and any key milestones.
 
-Communication – Preferred methods and frequency of communication (e.g., email, Slack, weekly check-ins).
+Communication – Preferred methods and frequency of communication.
 
-Ownership – Clarify who will own the finished work, intellectual property, or rights.
+Ownership – Who will own the finished work and any associated intellectual property.
 
-Confidentiality – Any NDA requirements or confidentiality expectations.
+Confidentiality – NDA requirements or other confidentiality expectations.
 
-Additional Notes – Any other relevant instructions, context, or preferences not covered above.`
+Additional Notes – Any other relevant information not captured above.
+
+Important Instructions:
+
+Do not hallucinate or fabricate details not supported by the input.`
 });
 
 export const convertTextToGig = asyncHandler(async (req, res) => {

@@ -20,7 +20,11 @@ const apiService = {
   baseUrl: 'http://localhost:3002/api',
 
   // Get improvement suggestions for a specific section
-  async improveSection(section: string, content: string, gigDescription: GigDescription): Promise<ImproveResponse> {
+  async improveSection(
+    section: string, 
+    content: string, 
+    gigDescription: GigDescription
+  ): Promise<ImproveResponse> {
     try {
       const response = await fetch(`${this.baseUrl}/improve`, {
         method: 'POST',

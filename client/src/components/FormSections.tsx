@@ -17,6 +17,7 @@ interface FormSectionsProps {
   handleAcceptSuggestion: (newContent: string) => void;
   handleDismissSuggestion: () => void;
   generateSuggestion: (section: keyof GigDescription, content: string) => void;
+  handleEnhanceSuggestion: (section: keyof GigDescription, content: string) => void;
   suggestions: SuggestionsState;
 }
 
@@ -32,6 +33,7 @@ const FormSections: React.FC<FormSectionsProps> = ({
   handleAcceptSuggestion,
   handleDismissSuggestion,
   generateSuggestion,
+  handleEnhanceSuggestion,
   suggestions,
 }) => {
   // Check if there's any active suggestion
@@ -57,6 +59,7 @@ const FormSections: React.FC<FormSectionsProps> = ({
             handleAcceptSuggestion={handleAcceptSuggestion}
             handleDismissSuggestion={handleDismissSuggestion}
             generateSuggestion={generateSuggestion}
+            handleEnhanceSuggestion={handleEnhanceSuggestion}
             hasActiveSuggestion={hasActiveSuggestion}
           />
         ))}
