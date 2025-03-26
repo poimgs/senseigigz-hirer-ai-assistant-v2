@@ -17,7 +17,7 @@ interface ImproveResponse {
 
 const apiService = {
   // Base URL for API calls
-  baseUrl: 'http://localhost:3002/api',
+  baseUrl: 'http://localhost:3001/api',
 
   // Get improvement suggestions for a specific section
   async improveSection(
