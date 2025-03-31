@@ -1,7 +1,7 @@
 export const validateImproveRequest = (req, res, next) => {
-  const { section, content } = req.body;
-  if (!section || !content) {
-    return res.status(400).json({ error: 'Section and content are required' });
+  const { section } = req.body;
+  if (!section) {
+    return res.status(400).json({ error: 'Section is required' });
   }
   next();
 };
