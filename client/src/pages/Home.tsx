@@ -70,18 +70,13 @@ const Home: React.FC = () => {
         <h1 className="text-3xl font-bold text-center mb-4">
           Create Your Gig Description
         </h1>
-        <p className="text-center text-gray-600 mb-8">
-          Describe your gig in plain English — who you're hiring, what they'll do, and what you're looking for.
-          We'll help turn your rough notes into a polished job description.
-        </p>
-
         <div className="flex flex-col gap-4">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="relative mb-4">
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe your gig in detail. For example:&#10;- What services do you offer?&#10;- What is your experience level?&#10;- What makes your service unique?&#10;&#10;Please provide as much information as possible."
+                placeholder="Describe your gig in plain English — The outcomes you want, activities that you will want a provider to do, and such. Or upload a file if you already have something written. We'll help turn your rough notes into a polished job description."
                 className="w-full h-64 p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 disabled={isLoading}
               />

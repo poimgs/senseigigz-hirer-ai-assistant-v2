@@ -36,7 +36,6 @@ function GigBuilder() {
   
   useEffect(() => {
     const state = location.state as LocationState;
-    console.log(state);
     if (state?.gigDescription) {
       setGigDescription(state.gigDescription);
       // Expand all sections that have content and activate them if they are optional
