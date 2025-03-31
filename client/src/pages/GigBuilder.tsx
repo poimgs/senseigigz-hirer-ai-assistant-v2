@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import FormSections from '../components/FormSections';
 import Header from '../components/Header';
 import { GigDescription } from '../types/gig';
 import { SuggestionData, SuggestionsState } from '../types/suggestion';
 import { formSections } from '../data/formSections';
-import apiService from '../services/apiService';
-import { findTextDifferences } from '../utils/textUtils';
+import { Eye } from 'lucide-react';
+import { useSuggestions } from '../hooks/useSuggestions';
 
 interface LocationState {
   gigDescription?: GigDescription;
@@ -14,6 +14,7 @@ interface LocationState {
 
 function GigBuilder() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [expandedSections, setExpandedSections] = useState<string[]>([]);
   const [activeSections, setActiveSections] = useState<string[]>([]);
   const [gigDescription, setGigDescription] = useState<GigDescription>({
@@ -30,10 +31,16 @@ function GigBuilder() {
     notes: '',
   });
   
-  const [suggestionData, setSuggestionData] = useState<SuggestionsState>({});
-  const [loading, setLoading] = useState(false);
-  const [activeSuggestionSection, setActiveSuggestionSection] = useState<string | null>(null);
-  
+  const {
+    loading,
+    suggestionData,
+    hasActiveSuggestion,
+    generateSuggestion: generateSuggestionBase,
+    handleEnhanceSuggestion: handleEnhanceSuggestionBase,
+    handleAcceptSuggestion: handleAcceptSuggestionBase,
+    handleDismissSuggestion
+  } = useSuggestions();
+
   useEffect(() => {
     const state = location.state as LocationState;
     if (state?.gigDescription) {
@@ -60,105 +67,16 @@ function GigBuilder() {
     setGigDescription(newGigDescription);
   };
 
-  const generateSuggestion = async (section: keyof GigDescription, content: string) => {
-    setLoading(true);
-    
-    try {
-      const data = await apiService.improveSection(section, content, gigDescription);
-      let parsedData: SuggestionData | null = null;
-      
-      try {
-        if (typeof data.text === 'string') {
-          parsedData = JSON.parse(data.text);
-        }
-      } catch (e) {
-        console.error('Error parsing JSON response:', e);
-        return;
-      }
-      
-      const suggestedText = parsedData?.suggested_update || data.suggestion || '';
-      const explanation = parsedData?.explanation || 'AI-generated suggestion for improving this section.';
-      const currentText = gigDescription[section];
-      const differences = findTextDifferences(currentText, suggestedText);
-      
-      setSuggestionData(prev => ({
-        ...prev,
-        [section]: {
-          suggestedUpdate: suggestedText,
-          explanation: explanation,
-          differences: differences
-        }
-      }));
-      
-      setActiveSuggestionSection(section);
-    } catch (error) {
-      console.error('Error generating suggestion:', error);
-    } finally {
-      setLoading(false);
-    }
+  const generateSuggestion = (section: keyof GigDescription, content: string) => {
+    generateSuggestionBase(section, content, gigDescription);
   };
 
-  const handleEnhanceSuggestion = async (section: keyof GigDescription, content: string) => {
-    setLoading(true);
-    try {
-      // Create a copy of gigDescription and clear the content of the target section
-      const gigDescriptionCopy = { ...gigDescription };
-      gigDescriptionCopy[section] = '';
-      
-      const data = await apiService.improveSection(section, content, gigDescriptionCopy, true);
-      let parsedData: SuggestionData | null = null;
-      
-      try {
-        if (typeof data.text === 'string') {
-          parsedData = JSON.parse(data.text);
-        }
-      } catch (e) {
-        console.error('Error parsing JSON response:', e);
-        return;
-      }
-      
-      const suggestedText = parsedData?.suggested_update || data.suggestion || '';
-      const explanation = parsedData?.explanation || 'Enhanced AI-generated suggestion for improving this section.';
-      const differences = findTextDifferences(content, suggestedText);
-      
-      setSuggestionData(prev => ({
-        ...prev,
-        [section]: {
-          suggestedUpdate: suggestedText,
-          explanation: explanation,
-          differences: differences
-        }
-      }));
-      
-      setActiveSuggestionSection(section);
-    } catch (error) {
-      console.error('Error enhancing suggestion:', error);
-    } finally {
-      setLoading(false);
-    }
+  const handleEnhanceSuggestion = (section: keyof GigDescription, content: string) => {
+    handleEnhanceSuggestionBase(section, content, gigDescription);
   };
 
   const handleAcceptSuggestion = (newContent: string) => {
-    if (activeSuggestionSection) {
-      updateGigDescription(activeSuggestionSection as keyof GigDescription, newContent);
-      setSuggestionData(prev => {
-        const newState = { ...prev };
-        delete newState[activeSuggestionSection];
-        return newState;
-      });
-      setActiveSuggestionSection(null);
-    }
-  };
-
-  const handleDismissSuggestion = () => {
-    if (activeSuggestionSection) {
-      setSuggestionData(prev => {
-        const newState = { ...prev };
-        delete newState[activeSuggestionSection];
-        return newState;
-      });
-      setActiveSuggestionSection(null);
-    }
+    handleAcceptSuggestionBase(newContent, updateGigDescription);
   };
 
   const toggleOptionalSection = (sectionId: string) => {
@@ -170,27 +88,32 @@ function GigBuilder() {
   };
 
   return (
-    <div className="flex h-screen">    
-      <div className="flex-1 overflow-auto">
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
         <Header />
-        <div className="my-4">
-          <FormSections
-            gigDescription={gigDescription}
-            updateGigDescription={updateGigDescription}
-            expandedSections={expandedSections}
-            setExpandedSections={setExpandedSections}
-            activeSections={activeSections}
-            sections={formSections}
-            loading={loading}
-            handleAcceptSuggestion={handleAcceptSuggestion}
-            handleDismissSuggestion={handleDismissSuggestion}
-            generateSuggestion={generateSuggestion}
-            handleEnhanceSuggestion={handleEnhanceSuggestion}
-            suggestions={suggestionData}
-            toggleOptionalSection={toggleOptionalSection}
-          />
-        </div>
+        <button
+          onClick={() => navigate('/content', { state: { gigDescription } })}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          <Eye className="w-5 h-5" />
+          View Content
+        </button>
       </div>
+      <FormSections
+        gigDescription={gigDescription}
+        updateGigDescription={updateGigDescription}
+        expandedSections={expandedSections}
+        setExpandedSections={setExpandedSections}
+        activeSections={activeSections}
+        sections={formSections}
+        loading={loading}
+        handleAcceptSuggestion={handleAcceptSuggestion}
+        handleDismissSuggestion={handleDismissSuggestion}
+        generateSuggestion={generateSuggestion}
+        handleEnhanceSuggestion={handleEnhanceSuggestion}
+        suggestions={suggestionData}
+        toggleOptionalSection={toggleOptionalSection}
+      />
     </div>
   );
 }
