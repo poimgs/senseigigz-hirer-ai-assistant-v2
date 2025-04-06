@@ -18,9 +18,9 @@ import {
   AlertCircle
 } from 'lucide-react';
 import Section from '../components/Section';
-import { Dialog, DialogContent } from '../components/ui/dialog';
 import { useSuggestions } from '../hooks/useSuggestions';
 import Header from '../components/Header';
+import Modal from '../components/Modal';
 
 interface LocationState {
   gigDescription?: GigDescription;
@@ -170,28 +170,26 @@ function Content() {
         </div>
       </div>
 
-      <Dialog open={!!editingSection} onOpenChange={() => setEditingSection(null)}>
-        <DialogContent>
-          {editingSection && (
-            <Section
-              section={formSections.find(s => s.id === editingSection)!}
-              gigDescription={gigDescriptionState}
-              updateGigDescription={handleUpdateGigDescription}
-              expandedSections={[editingSection]}
-              setExpandedSections={() => {}}
-              toggleOptionalSection={() => {}}
-              suggestion={suggestionData[editingSection]}
-              loading={loading}
-              handleAcceptSuggestion={handleAcceptSuggestion}
-              handleDismissSuggestion={handleDismissSuggestion}
-              generateSuggestion={generateSuggestion}
-              handleEnhanceSuggestion={handleEnhanceSuggestion}
-              hasActiveSuggestion={hasActiveSuggestion}
-              onClose={handleCloseDialog}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <Modal isOpen={!!editingSection} onClose={() => setEditingSection(null)}>
+        {editingSection && (
+          <Section
+            section={formSections.find(s => s.id === editingSection)!}
+            gigDescription={gigDescriptionState}
+            updateGigDescription={handleUpdateGigDescription}
+            expandedSections={[editingSection]}
+            setExpandedSections={() => {}}
+            toggleOptionalSection={() => {}}
+            suggestion={suggestionData[editingSection]}
+            loading={loading}
+            handleAcceptSuggestion={handleAcceptSuggestion}
+            handleDismissSuggestion={handleDismissSuggestion}
+            generateSuggestion={generateSuggestion}
+            handleEnhanceSuggestion={handleEnhanceSuggestion}
+            hasActiveSuggestion={hasActiveSuggestion}
+            onClose={handleCloseDialog}
+          />
+        )}
+      </Modal>
     </>
   );
 }
