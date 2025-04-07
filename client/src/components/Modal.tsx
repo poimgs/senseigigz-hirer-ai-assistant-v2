@@ -27,23 +27,24 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children, className = ''
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
       document.addEventListener('mousedown', handleClickOutside);
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = 'auto';
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.removeEventListener('mousedown', handleClickOutside);
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = 'auto';
+      document.body.style.paddingRight = '0';
     };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overflow-y-auto">
       <div
         ref={modalRef}
-        className={`bg-transparent rounded-lg max-w-xl w-full max-h-[90vh] overflow-y-auto ${className}`}
+        className={`bg-transparent rounded-lg max-w-xl w-full my-8 ${className}`}
       >
         {children}
       </div>

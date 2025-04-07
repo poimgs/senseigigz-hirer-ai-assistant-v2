@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Check, X, Zap } from 'lucide-react';
+import { Sparkles, Check, X, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import { SectionSuggestion } from '../types/suggestion';
 
 interface AIAssistantProps {
@@ -18,10 +18,19 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
   handleEnhanceSuggestion
 }) => {
   const [editedSuggestion, setEditedSuggestion] = useState('');
+  const [isExplanationExpanded, setIsExplanationExpanded] = useState(false);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (suggestion) {
       setEditedSuggestion(suggestion.suggestedUpdate);
+      // Adjust height after content is set
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.style.height = 'auto';
+          textareaRef.current.style.height = `${textareaRef.current.scrollHeight + 4}px`;
+        }
+      }, 0);
     }
   }, [suggestion]);
 
@@ -73,14 +82,30 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
       </div>
       <div className="space-y-4">
         <textarea
+          ref={textareaRef}
           value={editedSuggestion}
-          onChange={(e) => setEditedSuggestion(e.target.value)}
-          className="w-full text-gray-700 text-sm bg-white p-3 rounded-lg border border-blue-200 shadow-sm whitespace-pre-wrap break-words overflow-auto min-h-[100px] max-h-64 hover:shadow-md transition-shadow duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+          onChange={(e) => {
+            setEditedSuggestion(e.target.value);
+            // Also adjust height on user input
+            e.target.style.height = 'auto';
+            e.target.style.height = `${e.target.scrollHeight + 4}px`;
+          }}
+          className="w-full text-gray-700 text-sm bg-white p-3 rounded-lg border border-blue-200 shadow-sm whitespace-pre-wrap break-words overflow-auto max-h-64 hover:shadow-md transition-shadow duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
         />
         {suggestion.explanation && (
           <div className="text-gray-600 text-xs p-3 bg-gray-50 rounded-lg border border-gray-200 font-medium break-words hover:bg-gray-100 transition-colors duration-200">
-            <div className="font-semibold text-blue-600 mb-1">Explanation:</div>
-            {suggestion.explanation}
+            <button 
+              onClick={() => setIsExplanationExpanded(!isExplanationExpanded)}
+              className="flex items-center justify-between w-full text-left"
+            >
+              <div className="font-semibold text-blue-600 text-sm">Explanation</div>
+              {isExplanationExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+            </button>
+            {isExplanationExpanded && (
+              <div className="mt-2">
+                {suggestion.explanation}
+              </div>
+            )}
           </div>
         )}
       </div>

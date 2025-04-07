@@ -131,8 +131,8 @@ const Section: React.FC<SectionProps> = ({
               onClick={() => generateSuggestion(section.id, gigDescription[section.id])}
               className={`group relative p-1.5 rounded-full ${
                 hasActiveSuggestion
-                  ? 'text-gray-300 cursor-not-allowed'
-                  : 'text-gray-400 hover:bg-blue-50 hover:text-blue-600'
+                  ? 'text-gray-400 cursor-not-allowed'
+                  : 'text-blue-500 hover:bg-blue-50 hover:text-blue-600'
               } transition-colors`}
               disabled={hasActiveSuggestion}
             >

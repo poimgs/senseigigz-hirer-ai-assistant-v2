@@ -143,8 +143,6 @@ function Content() {
     );
   };
 
-  const currentSection = editingSection ? formSections.find(s => s.id === editingSection) : null;
-
   return (
     <>
       <Header />
@@ -153,12 +151,21 @@ function Content() {
           <div className="bg-white shadow-sm border border-gray-200 rounded-sm">
             <div className="p-12">
               {/* Title */}
-              <div className="text-center mb-12 pb-8 border-b border-gray-200">
-                <h1 className="text-3xl font-serif mb-4">
-                  {gigDescriptionState.title || (
-                    <span className="text-gray-400 italic">Add a title for your project</span>
-                  )}
-                </h1>
+              <div className="text-center mb-12 pb-8 border-b border-gray-200 group">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <h1 className="text-3xl font-serif">
+                    {gigDescriptionState.title || (
+                      <span className="text-gray-400 italic">Add a title for your project</span>
+                    )}
+                  </h1>
+                  <button
+                    onClick={() => setEditingSection('title')}
+                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded-full transition-all"
+                    title="Edit title"
+                  >
+                    <Edit2 className="w-4 h-4 text-gray-600" />
+                  </button>
+                </div>
               </div>
 
               {/* All Sections */}

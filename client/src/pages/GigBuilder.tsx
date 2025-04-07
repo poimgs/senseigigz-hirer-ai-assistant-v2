@@ -88,33 +88,36 @@ function GigBuilder() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <Header />
-        <button
-          onClick={() => navigate('/content', { state: { gigDescription } })}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Eye className="w-5 h-5" />
-          View Content
-        </button>
+    <>
+      <Header />
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          
+          <button
+            onClick={() => navigate('/content', { state: { gigDescription } })}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Eye className="w-5 h-5" />
+            View Content
+          </button>
+        </div>
+        <FormSections
+          gigDescription={gigDescription}
+          updateGigDescription={updateGigDescription}
+          expandedSections={expandedSections}
+          setExpandedSections={setExpandedSections}
+          activeSections={activeSections}
+          sections={formSections}
+          loading={loading}
+          handleAcceptSuggestion={handleAcceptSuggestion}
+          handleDismissSuggestion={handleDismissSuggestion}
+          generateSuggestion={generateSuggestion}
+          handleEnhanceSuggestion={handleEnhanceSuggestion}
+          suggestions={suggestionData}
+          toggleOptionalSection={toggleOptionalSection}
+        />
       </div>
-      <FormSections
-        gigDescription={gigDescription}
-        updateGigDescription={updateGigDescription}
-        expandedSections={expandedSections}
-        setExpandedSections={setExpandedSections}
-        activeSections={activeSections}
-        sections={formSections}
-        loading={loading}
-        handleAcceptSuggestion={handleAcceptSuggestion}
-        handleDismissSuggestion={handleDismissSuggestion}
-        generateSuggestion={generateSuggestion}
-        handleEnhanceSuggestion={handleEnhanceSuggestion}
-        suggestions={suggestionData}
-        toggleOptionalSection={toggleOptionalSection}
-      />
-    </div>
+    </>
   );
 }
 

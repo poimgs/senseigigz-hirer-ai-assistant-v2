@@ -19,6 +19,22 @@ const apiService = {
   // Base URL for API calls
   baseUrl: 'http://localhost:3001/api',
 
+  // Helper function to convert null values to empty strings
+  convertNullToEmptyString(obj: any): any {
+    if (obj === null) return '';
+    if (typeof obj !== 'object') return obj;
+    
+    if (Array.isArray(obj)) {
+      return obj.map(item => this.convertNullToEmptyString(item));
+    }
+    
+    const result: any = {};
+    for (const key in obj) {
+      result[key] = this.convertNullToEmptyString(obj[key]);
+    }
+    return result;
+  },
+
   // Get improvement suggestions for a specific section
   async improveSection(
     section: string, 
@@ -67,7 +83,8 @@ const apiService = {
         throw new Error(`API request failed with status: ${response.status}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      return this.convertNullToEmptyString(data);
     } catch (error) {
       console.error('Error calling convert-text API:', error);
       throw error;
