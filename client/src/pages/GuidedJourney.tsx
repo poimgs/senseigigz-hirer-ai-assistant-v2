@@ -55,20 +55,20 @@ const GuidedJourney: React.FC = () => {
     handleDismissSuggestion
   } = useSuggestions();
 
-  // Load saved draft if exists
-  useEffect(() => {
-    const savedDraft = localStorage.getItem('gigDescriptionDraft');
-    if (savedDraft) {
-      setDescription(savedDraft);
-    }
-  }, []);
+  // // Load saved draft if exists
+  // useEffect(() => {
+  //   const savedDraft = localStorage.getItem('gigDescriptionDraft');
+  //   if (savedDraft) {
+  //     setDescription(savedDraft);
+  //   }
+  // }, []);
 
-  // Save draft as user types
-  useEffect(() => {
-    if (description) {
-      localStorage.setItem('gigDescriptionDraft', description);
-    }
-  }, [description]);
+  // // Save draft as user types
+  // useEffect(() => {
+  //   if (description) {
+  //     localStorage.setItem('gigDescriptionDraft', description);
+  //   }
+  // }, [description]);
 
   const handleSubmit = async () => {
     if (!description.trim()) {
