@@ -149,7 +149,14 @@ const GuidedJourney: React.FC = () => {
       
       // Generate suggestions for the next section
       const nextSection = requiredSections[nextStep];
-      generateSuggestion(nextSection.id, gigData[nextSection.id], gigData);
+      if (nextSection.id === 'companyBackground') {
+        // Only generate suggestion if companyBackground is not empty
+        if (gigData[nextSection.id] && gigData[nextSection.id].trim() !== '') {
+          generateSuggestion(nextSection.id, gigData[nextSection.id], gigData);
+        }
+      } else {
+        generateSuggestion(nextSection.id, gigData[nextSection.id], gigData);
+      }
     }
   };
 
