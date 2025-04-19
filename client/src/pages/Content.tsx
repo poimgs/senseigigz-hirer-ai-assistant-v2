@@ -178,24 +178,26 @@ function Content() {
       </div>
 
       <Modal isOpen={!!editingSection} onClose={() => setEditingSection(null)}>
-        {editingSection && (
-          <Section
-            section={formSections.find(s => s.id === editingSection)!}
-            gigDescription={gigDescriptionState}
-            updateGigDescription={handleUpdateGigDescription}
-            expandedSections={[editingSection]}
-            setExpandedSections={() => {}}
-            toggleOptionalSection={() => {}}
-            suggestion={suggestionData[editingSection]}
-            loading={loading}
-            handleAcceptSuggestion={handleAcceptSuggestion}
-            handleDismissSuggestion={handleDismissSuggestion}
-            generateSuggestion={generateSuggestion}
-            handleEnhanceSuggestion={handleEnhanceSuggestion}
-            hasActiveSuggestion={hasActiveSuggestion}
-            onClose={handleCloseDialog}
-          />
-        )}
+        <div className="max-h-[85vh] overflow-y-auto">
+          {editingSection && (
+            <Section
+              section={formSections.find(s => s.id === editingSection)!}
+              gigDescription={gigDescriptionState}
+              updateGigDescription={handleUpdateGigDescription}
+              expandedSections={[editingSection]}
+              setExpandedSections={() => {}}
+              toggleOptionalSection={() => {}}
+              suggestion={suggestionData[editingSection]}
+              loading={loading}
+              handleAcceptSuggestion={handleAcceptSuggestion}
+              handleDismissSuggestion={handleDismissSuggestion}
+              generateSuggestion={generateSuggestion}
+              handleEnhanceSuggestion={handleEnhanceSuggestion}
+              hasActiveSuggestion={hasActiveSuggestion}
+              onClose={handleCloseDialog}
+            />
+          )}
+        </div>
       </Modal>
     </>
   );

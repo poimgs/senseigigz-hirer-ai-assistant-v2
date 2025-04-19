@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HelpCircle, ChevronDown, ChevronUp, Sparkles, X } from 'lucide-react';
 import { GigDescription } from '../types/gig';
 import { FormSection } from '../types/form';
@@ -47,12 +47,22 @@ const Section: React.FC<SectionProps> = ({
     );
   };
 
+  useEffect(() => {
+    if (expandedSections.includes(section.id)) {
+      const textarea = document.getElementById(section.id) as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${textarea.scrollHeight + 4}px`;
+      }
+    }
+  }, [expandedSections, section.id]);
+
   return (
     <div
       key={section.id}
       className={`bg-white p-4 rounded-lg shadow-sm border border-gray-200 ${
         expandedSections.includes(section.id) ? 'mb-4' : 'border-b-0'
-      }`}
+      } max-w-full`}
       data-section={section.id}
     >
       <div className="relative">
@@ -92,7 +102,6 @@ const Section: React.FC<SectionProps> = ({
             </button>
             <button
               className="group relative ml-1"
-              title={section.description}
             >
               <HelpCircle className="w-4 h-4 text-gray-400" />
               <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-2 bg-gray-800 text-white text-sm text-left rounded shadow-lg">
@@ -151,12 +160,14 @@ const Section: React.FC<SectionProps> = ({
                 id={section.id}
                 value={gigDescription[section.id as keyof typeof gigDescription]}
                 onChange={(e) => {
-                  e.target.style.height = 'auto';
-                  e.target.style.height = e.target.scrollHeight + 'px';
-                  updateGigDescription(section.id, e.target.value);
+                  const target = e.target;
+                  // Auto adjust height on user input
+                  target.style.height = 'auto';
+                  target.style.height = `${target.scrollHeight + 4}px`;
+                  updateGigDescription(section.id, target.value);
                 }}
                 placeholder={section.placeholder}
-                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y overflow-hidden ${
+                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y min-h-[100px] whitespace-pre-wrap break-words ${
                   suggestion ? 'bg-gray-100 text-gray-500' : ''
                 }`}
                 disabled={!!suggestion}

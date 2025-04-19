@@ -87,7 +87,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
             value={editedSuggestion}
             onChange={(e) => {
               setEditedSuggestion(e.target.value);
-            // Also adjust height on user input
+              // Auto adjust height on user input
               e.target.style.height = 'auto';
               e.target.style.height = `${e.target.scrollHeight + 4}px`;
             }}
