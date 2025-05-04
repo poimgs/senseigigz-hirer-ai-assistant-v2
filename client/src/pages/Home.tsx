@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, Edit2, Upload } from 'lucide-react';
 import Header from '../components/Header';
-import apiService from '../services/apiService';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -16,19 +15,8 @@ const Home: React.FC = () => {
     navigate('/content');
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const extractedText = await apiService.extractTextFromFile(formData);
-      navigate('/content', { state: { initialText: extractedText } });
-    } catch (err) {
-      console.error('Failed to process file:', err);
-      // You might want to show an error toast here
-    }
+  const handleFileUpload = () => {
+    alert('File upload is not implemented yet');
   };
 
   return (

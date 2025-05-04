@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Upload, ArrowLeft, ArrowRight, HelpCircle, Sparkles } from 'lucide-react';
 import Header from '../components/Header';
@@ -55,21 +55,6 @@ const GuidedJourney: React.FC = () => {
     handleDismissSuggestion
   } = useSuggestions();
 
-  // // Load saved draft if exists
-  // useEffect(() => {
-  //   const savedDraft = localStorage.getItem('gigDescriptionDraft');
-  //   if (savedDraft) {
-  //     setDescription(savedDraft);
-  //   }
-  // }, []);
-
-  // // Save draft as user types
-  // useEffect(() => {
-  //   if (description) {
-  //     localStorage.setItem('gigDescriptionDraft', description);
-  //   }
-  // }, [description]);
-
   const handleSubmit = async () => {
     if (!description.trim()) {
       setError('Please enter a description');
@@ -83,7 +68,6 @@ const GuidedJourney: React.FC = () => {
       const gigDescription = await apiService.convertTextToGig(description);
       setGigData(gigDescription);
       setCurrentStep(0); // Move to first section
-      localStorage.removeItem('gigDescriptionDraft'); // Clear the draft since we're moving forward
       
       // Generate initial suggestions for the first section
       const currentSection = requiredSections[0];
@@ -95,23 +79,8 @@ const GuidedJourney: React.FC = () => {
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const extractedText = await apiService.extractTextFromFile(formData);
-      setDescription(extractedText);
-    } catch (err) {
-      setError('Failed to process file. Please try again or paste the content directly.');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleFileUpload = () => {
+    alert('File upload is not implemented yet');
   };
 
   const handleSectionUpdate = (value: string) => {

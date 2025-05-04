@@ -183,7 +183,7 @@ const Section: React.FC<SectionProps> = ({
                   handleDismissSuggestion={handleDismissSuggestion}
                   handleEnhanceSuggestion={
                     suggestion 
-                      ? (newContent: string) => handleEnhanceSuggestion(section.id, newContent)
+                      ? (newContent: string) => generateSuggestion(section.id, newContent)
                       : undefined
                   }
                 />
