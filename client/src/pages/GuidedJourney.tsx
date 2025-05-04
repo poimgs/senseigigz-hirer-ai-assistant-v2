@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, Upload, ArrowLeft, ArrowRight, HelpCircle, Sparkles } from 'lucide-react';
 import Header from '../components/Header';
 import apiService from '../services/apiService';
-import { formSections } from '../data/formSections';
+import { formSections } from '../data/SectionMetadata';
 import { GigDescription } from '../types/gig';
 import { useSuggestions } from '../hooks/useSuggestions';
 import AIAssistant from '../components/AIAssistant';
@@ -269,28 +269,15 @@ const GuidedJourney: React.FC = () => {
             </div>
 
             <div className="mb-6">
-              {currentSection.textArea ? (
-                <textarea
-                  value={gigData[currentSection.id as keyof GigDescription]}
-                  onChange={(e) => handleSectionUpdate(e.target.value)}
-                  placeholder={currentSection.placeholder}
-                  className={`w-full h-40 p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    hasActiveSuggestion ? 'bg-gray-100 cursor-not-allowed' : ''
-                  }`}
-                  disabled={hasActiveSuggestion}
-                />
-              ) : (
-                <input
-                  type="text"
-                  value={gigData[currentSection.id as keyof GigDescription]}
-                  onChange={(e) => handleSectionUpdate(e.target.value)}
-                  placeholder={currentSection.placeholder}
-                  className={`w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    hasActiveSuggestion ? 'bg-gray-100 cursor-not-allowed' : ''
-                  }`}
-                  disabled={hasActiveSuggestion}
-                />
-              )}
+              <textarea
+                value={gigData[currentSection.id as keyof GigDescription]}
+                onChange={(e) => handleSectionUpdate(e.target.value)}
+                placeholder={currentSection.placeholder}
+                className={`w-full h-40 p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  hasActiveSuggestion ? 'bg-gray-100 cursor-not-allowed' : ''
+                }`}
+                disabled={hasActiveSuggestion}
+              />
             </div>
 
             {/* AI Assistant */}

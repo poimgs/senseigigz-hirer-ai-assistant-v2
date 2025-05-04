@@ -1,7 +1,4 @@
-import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { GigDescription } from '../types/gig';
-import { formSections } from '../data/formSections';
+import React from 'react';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -18,44 +15,10 @@ import {
   AlertCircle
 } from 'lucide-react';
 import Section from '../components/Section';
-import { useSuggestions } from '../hooks/useSuggestions';
 import Header from '../components/Header';
 import Modal from '../components/Modal';
 
-interface LocationState {
-  gigDescription?: GigDescription;
-}
-
 function Content() {
-  const location = useLocation();
-  const state = location.state as LocationState;
-  const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [gigDescriptionState, setGigDescriptionState] = useState<GigDescription>(
-    state?.gigDescription || {
-      title: '',
-      summary: '',
-      companyBackground: '',
-      deliverables: '',
-      skills: '',
-      budget: '',
-      timeline: '',
-      communication: '',
-      ownership: '',
-      confidentiality: '',
-      notes: ''
-    }
-  );
-
-  const {
-    loading,
-    suggestionData,
-    hasActiveSuggestion,
-    generateSuggestion: generateSuggestionBase,
-    handleEnhanceSuggestion: handleEnhanceSuggestionBase,
-    handleAcceptSuggestion: handleAcceptSuggestionBase,
-    handleDismissSuggestion
-  } = useSuggestions();
-
   const sectionIcons: Record<string, React.ReactNode> = {
     title: <LayoutDashboard className="w-5 h-5" />,
     summary: <FileText className="w-5 h-5" />,
@@ -180,22 +143,7 @@ function Content() {
       <Modal isOpen={!!editingSection} onClose={() => setEditingSection(null)}>
         <div className="max-h-[85vh] overflow-y-auto">
           {editingSection && (
-            <Section
-              section={formSections.find(s => s.id === editingSection)!}
-              gigDescription={gigDescriptionState}
-              updateGigDescription={handleUpdateGigDescription}
-              expandedSections={[editingSection]}
-              setExpandedSections={() => {}}
-              toggleOptionalSection={() => {}}
-              suggestion={suggestionData[editingSection]}
-              loading={loading}
-              handleAcceptSuggestion={handleAcceptSuggestion}
-              handleDismissSuggestion={handleDismissSuggestion}
-              generateSuggestion={generateSuggestion}
-              handleEnhanceSuggestion={handleEnhanceSuggestion}
-              hasActiveSuggestion={hasActiveSuggestion}
-              onClose={handleCloseDialog}
-            />
+            <Section />
           )}
         </div>
       </Modal>

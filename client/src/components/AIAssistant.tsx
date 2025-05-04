@@ -1,29 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Check, X, Zap, ChevronDown, ChevronUp } from 'lucide-react';
-import { SectionSuggestion } from '../types/suggestion';
+import { useGigOperations } from '../contexts/GigContext';
 
-interface AIAssistantProps {
-  suggestion: SectionSuggestion | null;
-  loading: boolean;
-  handleAcceptSuggestion: (newContent: string) => void;
-  handleDismissSuggestion: () => void;
-  handleEnhanceSuggestion?: (currentSuggestion: string) => void;
-}
-
-const AIAssistant: React.FC<AIAssistantProps> = ({ 
-  suggestion,
-  loading,
-  handleAcceptSuggestion,
-  handleDismissSuggestion,
-  handleEnhanceSuggestion
-}) => {
-  const [editedSuggestion, setEditedSuggestion] = useState('');
-  const [isExplanationExpanded, setIsExplanationExpanded] = useState(false);
+const AIAssistant = () => {
+  const {
+    suggestion,
+    explanation,
+    loading,
+    activeSection,
+    generateSuggestion,
+    setSuggestion,
+    handleAcceptSuggestion,
+    handleDismissSuggestion
+  } = useGigOperations();
+  const [showExplanation, setShowExplanation] = useState(false);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (suggestion) {
-      setEditedSuggestion(suggestion.suggestedUpdate);
+    if (suggestion || activeSection) {
       // Adjust height after content is set
       setTimeout(() => {
         if (textareaRef.current) {
@@ -32,7 +26,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
         }
       }, 0);
     }
-  }, [suggestion]);
+  }, [suggestion, activeSection]);
 
   if (loading) {
     return (
@@ -43,7 +37,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
     );
   }
 
-  if (!suggestion) {
+  if (!suggestion || !activeSection) {
     return null;
   }
 
@@ -56,21 +50,23 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
         </div>
         <div className="flex space-x-2">
           <button
-            onClick={() => handleAcceptSuggestion(editedSuggestion)}
+            onClick={handleAcceptSuggestion}
             className="flex items-center px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
           >
             <Check size={16} className="mr-1" />
             Accept
           </button>
-          {handleEnhanceSuggestion && (
-            <button
-              onClick={() => handleEnhanceSuggestion(editedSuggestion)}
-              className="flex items-center px-3 py-1 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
-            >
-              <Zap size={16} className="mr-1" />
-              Enhance
-            </button>
-          )}
+          <button
+            onClick={() => {
+              if (activeSection) {
+                generateSuggestion(activeSection);
+              }
+            }}
+            className="flex items-center px-3 py-1 text-sm bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors"
+          >
+            <Zap size={16} className="mr-1" />
+            Enhance
+          </button>
           <button
             onClick={handleDismissSuggestion}
             className="flex items-center px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors"
@@ -84,9 +80,9 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
         <div className="relative">
           <textarea
             ref={textareaRef}
-            value={editedSuggestion}
+            value={suggestion}
             onChange={(e) => {
-              setEditedSuggestion(e.target.value);
+              setSuggestion(e.target.value);
               // Auto adjust height on user input
               e.target.style.height = 'auto';
               e.target.style.height = `${e.target.scrollHeight + 4}px`;
@@ -99,18 +95,18 @@ const AIAssistant: React.FC<AIAssistantProps> = ({
             <span>Feel free to modify this suggestion to better suit your needs before accepting</span>
           </div>
         </div>
-        {suggestion.explanation && (
+        {explanation && (
           <div className="text-gray-600 text-xs p-3 bg-gray-50 rounded-lg border border-gray-200 font-medium break-words hover:bg-gray-100 transition-colors duration-200">
             <button 
-              onClick={() => setIsExplanationExpanded(!isExplanationExpanded)}
+              onClick={() => setShowExplanation(!showExplanation)}
               className="flex items-center justify-between w-full text-left"
             >
               <div className="font-semibold text-blue-600 text-sm">Explanation (Internal use Only)</div>
-              {isExplanationExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              {showExplanation ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </button>
-            {isExplanationExpanded && (
+            {showExplanation && (
               <div className="mt-2">
-                {suggestion.explanation}
+                {explanation}
               </div>
             )}
           </div>
