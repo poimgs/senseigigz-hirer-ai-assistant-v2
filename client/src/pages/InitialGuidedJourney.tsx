@@ -18,6 +18,8 @@ const InitialGuidedJourney: React.FC = () => {
     setContent,
     setActiveSection,
     generateSuggestion,
+    generateSuggestionWithGig,
+    setGig,
     reset
   } = useGigOperations();
 
@@ -32,24 +34,12 @@ const InitialGuidedJourney: React.FC = () => {
 
     try {
       const gigData = await apiService.convertTextToGig(description);
-      
-      // Update each field of the gig data
-      Object.entries(gigData).forEach(([key, value]) => {
-        if (typeof value === 'string') {
-          setContent(value);
-          setActiveSection(key as any);
-        }
-      });
-      
-      // Set active section to the first section
+      setGig(gigData);
+    
       const firstSection = guidedJourneyOrder[0];
       setActiveSection(firstSection);
-      
-      // Navigate to the first section
       navigate(`/guided-journey/${firstSection}`);
-      
-      // Generate initial suggestions for the first section
-      generateSuggestion(firstSection);
+      generateSuggestionWithGig(firstSection, gigData);
     } catch (err) {
       setError('Failed to process the description. Please try again.');
     } finally {

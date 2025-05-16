@@ -23,6 +23,7 @@ type GigAction =
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'CLEAR_SUGGESTION' }
   | { type: 'CLEAR_EXPLANATION' }
+  | { type: 'SET_GIG'; payload: Gig }
   | { type: 'RESET' };
 
 // Initial state
@@ -81,6 +82,11 @@ const gigReducer = (state: GigState, action: GigAction): GigState => {
       return {
         ...state,
         explanation: ''
+      };
+    case 'SET_GIG':
+      return {
+        ...state,
+        gig: action.payload
       };
     case 'RESET':
       return initialGigState;
@@ -162,6 +168,22 @@ export function useGigOperations() {
     }
   };
 
+  // This version accepts a gig directly rather than using state.gig
+  const generateSuggestionWithGig = async (section: keyof Gig, gig: Gig) => {    
+    dispatch({ type: 'SET_LOADING', payload: true });
+    try {
+      const data = await apiService.improveSection(section, gig, '');
+      dispatch({ type: 'SET_SUGGESTION', payload: data.suggestion || '' });
+      dispatch({ type: 'SET_EXPLANATION', payload: data.explanation || '' });
+    } catch (error) {
+      console.error('Error generating suggestion with gig:', error);
+      dispatch({ type: 'SET_SUGGESTION', payload: 'Sorry, I encountered an error. Please try again later.' });
+      dispatch({ type: 'SET_EXPLANATION', payload: 'Sorry, I encountered an error. Please try again later.' });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+
   const handleAcceptSuggestion = () => {
     if (state.activeSection && state.suggestion) {
       setContent(state.suggestion);
@@ -171,6 +193,10 @@ export function useGigOperations() {
 
   const handleDismissSuggestion = () => {
     clearSuggestion();
+  };
+
+  const setGig = (gig: Gig) => {
+    dispatch({ type: 'SET_GIG', payload: gig });
   };
 
   return {
@@ -186,7 +212,9 @@ export function useGigOperations() {
     clearSuggestion,
     reset,
     generateSuggestion,
+    generateSuggestionWithGig,
     handleAcceptSuggestion,
-    handleDismissSuggestion
+    handleDismissSuggestion,
+    setGig
   };
 }
