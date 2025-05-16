@@ -22,11 +22,15 @@ import { Gig } from '../types/gig';
 import { sectionMetadata } from '../data/SectionMetadata';
 
 function Content() {
-  const [editingSection, setEditingSection] = useState<keyof Gig | null>(null);
+  const [editingSection, setEditingSection] = useState<boolean>(false);
+  const [originalContent, setOriginalContent] = useState<string>('');
   const { 
     gig, 
     activeSection, 
-    setActiveSection
+    setActiveSection,
+    setContent,
+    suggestion,
+    handleAcceptSuggestion
   } = useGigOperations();
 
   const sectionIcons: Record<string, React.ReactNode> = {
@@ -44,12 +48,23 @@ function Content() {
   };
 
   const handleOpenSection = (section: keyof Gig) => {
-    setEditingSection(section);
+    setEditingSection(true);
     setActiveSection(section);
+    setOriginalContent(gig[section]);
   };
 
-  const handleCloseDialog = () => {
-    setEditingSection(null);
+  const handleConfirm = () => {
+    if (suggestion) {
+      handleAcceptSuggestion();
+    }
+    setEditingSection(false);
+    setActiveSection(null);
+  };
+
+  const handleCancel = () => {
+    setContent(originalContent);
+    setEditingSection(false);
+    setActiveSection(null);
   };
 
   const renderSection = (sectionId: string) => {
@@ -138,7 +153,7 @@ function Content() {
         </div>
       </div>
 
-      <Modal isOpen={!!editingSection} onClose={handleCloseDialog}>
+      <Modal isOpen={editingSection} onConfirm={handleConfirm} onClose={handleCancel}>
         <div className="max-h-[85vh] overflow-y-auto">
           {editingSection && activeSection && (
             <Section />
