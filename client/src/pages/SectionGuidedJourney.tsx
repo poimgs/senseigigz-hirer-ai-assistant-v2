@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, HelpCircle, Sparkles } from 'lucide-react';
 import Header from '../components/Header';
@@ -19,6 +19,7 @@ const SectionGuidedJourney: React.FC = () => {
   const navigate = useNavigate();
   const { sectionId } = useParams<{ sectionId?: SectionId }>();
   const [error, setError] = React.useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   
   // Validate sectionId
   if (!sectionId || !guidedJourneyOrder.includes(sectionId as SectionId)) {
@@ -30,35 +31,32 @@ const SectionGuidedJourney: React.FC = () => {
   const {
     gig,
     setContent,
-    setActiveSection,
+    suggestion,
     generateSuggestion,
-    reset
+    reset,
+    loading,
+    handleAcceptSuggestion,
+    setActiveSection
   } = useGigOperations();
 
-  // Sync the active section with the URL parameter
-  useEffect(() => {
-    if (sectionId && guidedJourneyOrder.includes(sectionId as SectionId)) {
-      setActiveSection(sectionId as SectionId);
-      
-      // Generate suggestions for the section if needed
-      if (sectionId === 'companyBackground') {
-        if (gig[sectionId] && gig[sectionId].trim() !== '') {
-          generateSuggestion(sectionId as SectionId);
-        }
-      } else {
-        generateSuggestion(sectionId as SectionId);
-      }
-    }
-  }, [sectionId, setActiveSection, generateSuggestion, gig]);
-
-  const handleSectionUpdate = (value: string) => {
-    setContent(value);
+  const adjustTextareaHeight = () => {
+    textareaRef.current!.style.height = 'auto';
+    textareaRef.current!.style.height = `${textareaRef.current!.scrollHeight + 4}px`;
   };
+  
+  // Adjust height whenever the content changes from context
+  useEffect(() => {
+    if (textareaRef.current) {
+      adjustTextareaHeight();
+    }
+  }, [gig[sectionId as keyof Gig]]);
 
   const handleNext = () => {
     const currentIndex = getSectionIndex(sectionId);
-    
-    if (!gig[sectionId].trim()) {
+
+    if (suggestion) {
+      handleAcceptSuggestion();
+    } else if (!gig[sectionId].trim()) {
       setError(`Please complete the ${sectionMetadata[sectionId]!.title} section`);
       return;
     }
@@ -87,107 +85,111 @@ const SectionGuidedJourney: React.FC = () => {
     const currentIndex = getSectionIndex(sectionId as SectionId);
     
     if (currentIndex === 0) {
-      // If on the first section, go back to initial screen
       navigate('/guided-journey');
-      reset(); // Reset the gig state when going back to initial screen
+      reset();
     } else {
-      // Otherwise go to the previous section
       const prevSectionId = guidedJourneyOrder[currentIndex - 1];
+      setActiveSection(prevSectionId);
       navigate(`/guided-journey/${prevSectionId}`);
       setError(null);
     }
   };
   
   // Get the current section info
-  const currentSection = sectionId ? sectionMetadata[sectionId as SectionId] : null;
-  if (!currentSection) return null;
+  const currentSectionMetadata = sectionId ? sectionMetadata[sectionId as SectionId] : null;
+  if (!currentSectionMetadata) return null;
+  
+  // Calculate progress percentage
+  const progress = ((getSectionIndex(sectionId as SectionId) + 1) / guidedJourneyOrder.length) * 100;
   
   return (
     <>
       <Header />
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <div className="container mx-auto max-w-3xl py-16 px-4">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">
-              {currentSection.title}
-            </h1>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleBack}
-                className="p-2 rounded-lg hover:bg-gray-100"
-              >
-                <ArrowLeft size={20} />
-              </button>
-              <button
-                onClick={handleNext}
-                className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700"
-              >
-                <ArrowRight size={20} />
-              </button>
+          {/* Progress bar */}
+          <div className="mb-8">
+            <div className="h-2 bg-gray-200 rounded-full">
+              <div 
+                className="h-full bg-blue-600 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
             </div>
+            <p className="text-sm text-gray-600 mt-2">
+              Step {getSectionIndex(sectionId as SectionId) + 1} of {guidedJourneyOrder.length}
+            </p>
           </div>
 
-          <div className="flex flex-col gap-6">
-            {/* Section information */}
-            <div className="bg-blue-50 p-4 rounded-lg flex items-start gap-3">
-              <div className="mt-1">
-                <HelpCircle size={20} className="text-blue-600" />
-              </div>
-              <div>
-                <h3 className="font-medium text-blue-800 mb-1">
-                  {currentSection.title}
-                </h3>
-                <p className="text-blue-700 text-sm">
-                  {currentSection.description}
-                </p>
-              </div>
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="flex items-center gap-2 mb-4">
+              <h2 className="text-2xl font-semibold">{currentSectionMetadata.title}</h2>
+              <button
+                className="group relative"
+                title={currentSectionMetadata.description}
+              >
+                <HelpCircle className="w-5 h-5 text-gray-400" />
+                <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-2 bg-gray-800 text-white text-sm rounded shadow-lg z-10">
+                  {currentSectionMetadata.description}
+                  {currentSectionMetadata.example && (
+                    <div className="mt-2 pt-2 border-t border-gray-700">
+                      <span className="font-semibold">Example:</span>
+                      <p className="text-gray-300 text-xs mt-1 whitespace-pre-line">{currentSectionMetadata.example}</p>
+                    </div>
+                  )}
+                </div>
+              </button>
+              <button
+                onClick={() => generateSuggestion(sectionId)}
+                className={`group relative p-1.5 rounded-full ${
+                  loading || !!suggestion
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-blue-500 hover:bg-blue-50 hover:text-blue-600'
+                } transition-colors ml-auto`}
+                disabled={loading || !!suggestion}
+              >
+                <Sparkles size={16} />
+                <span className="absolute right-0 -bottom-8 whitespace-nowrap text-sm bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                  {!!suggestion ? 'Please resolve the current suggestion first' : 'Improve with AI'}
+                </span>
+              </button>
             </div>
 
-            {/* Content editor */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="mb-6">
               <textarea
+                ref={textareaRef}
                 value={gig[sectionId as keyof Gig] || ''}
-                onChange={(e) => handleSectionUpdate(e.target.value)}
-                placeholder={currentSection.placeholder}
-                className="w-full h-64 p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={(e) => setContent(e.target.value)}
+                // placeholder={currentSectionMetadata.placeholder}
+                className={`w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  loading || !!suggestion ? 'bg-gray-100 cursor-not-allowed' : ''
+                }`}
+                disabled={loading || !!suggestion}
+                style={{ overflow: 'hidden' }}
               />
-
-              {error && (
-                <p className="text-red-500 mt-4">{error}</p>
-              )}
+            </div>
+            <div className="mb-6">
+              <AIAssistant />
             </div>
 
-            <AIAssistant />
+            {error && (
+              <p className="text-red-500 mb-4">{error}</p>
+            )}
 
-            {/* Navigation buttons - mobile optimized */}
-            <div className="flex justify-between mt-4 md:hidden">
+            <div className="flex justify-between gap-4">
               <button
                 onClick={handleBack}
-                className="p-3 rounded-lg border border-gray-300 hover:bg-gray-100"
+                className="px-6 py-2 text-gray-600 hover:text-gray-800 flex items-center gap-2"
               >
                 <ArrowLeft size={20} />
+                Back
               </button>
               <button
                 onClick={handleNext}
-                className="p-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+                className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
+                {getSectionIndex(sectionId as SectionId) === guidedJourneyOrder.length - 1 ? 'Finish' : 'Next'}
                 <ArrowRight size={20} />
               </button>
-            </div>
-
-            {/* Progress display */}
-            <div className="flex items-center gap-2 mt-4">
-              <div className="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-blue-600"
-                  style={{
-                    width: `${((getSectionIndex(sectionId as SectionId) + 1) / guidedJourneyOrder.length) * 100}%`
-                  }}
-                ></div>
-              </div>
-              <span className="text-sm text-gray-500">
-                {getSectionIndex(sectionId as SectionId) + 1} / {guidedJourneyOrder.length}
-              </span>
             </div>
           </div>
         </div>

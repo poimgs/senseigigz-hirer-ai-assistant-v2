@@ -95,6 +95,7 @@ const AIAssistant = () => {
             <span>Feel free to modify this suggestion to better suit your needs before accepting</span>
           </div>
         </div>
+        {/* Internal use only - Should only be visible to Admin. Remove for other users when auth is integrated */}
         {explanation && (
           <div className="text-gray-600 text-xs p-3 bg-gray-50 rounded-lg border border-gray-200 font-medium break-words hover:bg-gray-100 transition-colors duration-200">
             <button 

@@ -1,4 +1,4 @@
-import { Gig, GigDescription } from "../types/gig";
+import { Gig } from "../types/gig";
 
 // Define message type for chat interactions
 export type MessageType = {
@@ -69,7 +69,7 @@ const apiService = {
   },
 
   // Convert plain text to structured gig description
-  async convertTextToGig(text: string): Promise<GigDescription> {
+  async convertTextToGig(text: string): Promise<Gig> {
     try {
       const response = await fetch(`${this.baseUrl}/convert-text-to-gig`, {
         method: 'POST',
