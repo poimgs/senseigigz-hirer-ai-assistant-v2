@@ -38,6 +38,13 @@ const SectionGuidedJourney: React.FC = () => {
     handleAcceptSuggestion,
     setActiveSection
   } = useGigOperations();
+  
+  // Set active section whenever sectionId changes
+  useEffect(() => {
+    if (sectionId) {
+      setActiveSection(sectionId as keyof Gig);
+    }
+  }, [sectionId]); // Remove setActiveSection from dependencies
 
   const adjustTextareaHeight = () => {
     textareaRef.current!.style.height = 'auto';
@@ -128,7 +135,7 @@ const SectionGuidedJourney: React.FC = () => {
                 title={currentSectionMetadata.description}
               >
                 <HelpCircle className="w-5 h-5 text-gray-400" />
-                <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-2 bg-gray-800 text-white text-sm rounded shadow-lg z-10">
+                <div className="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-2 bg-gray-800 text-white text-sm text-left rounded shadow-lg z-10">
                   {currentSectionMetadata.description}
                   {currentSectionMetadata.example && (
                     <div className="mt-2 pt-2 border-t border-gray-700">
@@ -159,7 +166,7 @@ const SectionGuidedJourney: React.FC = () => {
                 ref={textareaRef}
                 value={gig[sectionId as keyof Gig] || ''}
                 onChange={(e) => setContent(e.target.value)}
-                // placeholder={currentSectionMetadata.placeholder}
+                placeholder={loading ? 'Generating...' : suggestion ? '' : currentSectionMetadata.placeholder}
                 className={`w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   loading || !!suggestion ? 'bg-gray-100 cursor-not-allowed' : ''
                 }`}
