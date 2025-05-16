@@ -4,10 +4,8 @@ Hirer Advisor is a web application that helps users create professional gig desc
 
 ## Features
 
-- Interactive form for creating gig descriptions
-- AI-powered chat interface for getting help and suggestions
-- Section-by-section improvement recommendations
-- Real-time AI assistance using OpenAI's API
+- Section-by-section guided journey to create a complete gig description
+- AI-powered interface for getting suggestions
 
 ## Tech Stack
 
