@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -17,8 +17,18 @@ import {
 import Section from '../components/Section';
 import Header from '../components/Header';
 import Modal from '../components/Modal';
+import { useGigOperations } from '../contexts/GigContext';
+import { Gig } from '../types/gig';
+import { sectionMetadata } from '../data/SectionMetadata';
 
 function Content() {
+  const [editingSection, setEditingSection] = useState<keyof Gig | null>(null);
+  const { 
+    gig, 
+    activeSection, 
+    setActiveSection
+  } = useGigOperations();
+
   const sectionIcons: Record<string, React.ReactNode> = {
     title: <LayoutDashboard className="w-5 h-5" />,
     summary: <FileText className="w-5 h-5" />,
@@ -33,23 +43,9 @@ function Content() {
     notes: <StickyNote className="w-5 h-5" />
   };
 
-  const handleUpdateGigDescription = (section: keyof GigDescription, value: string) => {
-    setGigDescriptionState(prev => ({
-      ...prev,
-      [section]: value
-    }));
-  };
-
-  const generateSuggestion = (section: keyof GigDescription, content: string) => {
-    generateSuggestionBase(section, content, gigDescriptionState);
-  };
-
-  const handleEnhanceSuggestion = (section: keyof GigDescription, content: string) => {
-    handleEnhanceSuggestionBase(section, content, gigDescriptionState);
-  };
-
-  const handleAcceptSuggestion = (newContent: string) => {
-    handleAcceptSuggestionBase(newContent, handleUpdateGigDescription);
+  const handleOpenSection = (section: keyof Gig) => {
+    setEditingSection(section);
+    setActiveSection(section);
   };
 
   const handleCloseDialog = () => {
@@ -57,10 +53,10 @@ function Content() {
   };
 
   const renderSection = (sectionId: string) => {
-    const section = formSections.find(s => s.id === sectionId);
+    const section = sectionMetadata[sectionId as keyof Gig];
     if (!section) return null;
 
-    const content = gigDescriptionState[sectionId as keyof GigDescription];
+    const content = gig[sectionId as keyof Gig];
     const isEmpty = !content || content.trim() === '';
     const isRequired = section.required;
 
@@ -82,7 +78,7 @@ function Content() {
                 )}
               </div>
               <button
-                onClick={() => setEditingSection(sectionId)}
+                onClick={() => handleOpenSection(sectionId as keyof Gig)}
                 className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded-full transition-all"
                 title="Edit section"
               >
@@ -117,12 +113,12 @@ function Content() {
               <div className="text-center mb-12 pb-8 border-b border-gray-200 group">
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <h1 className="text-3xl font-serif">
-                    {gigDescriptionState.title || (
+                    {gig.title || (
                       <span className="text-gray-400 italic">Add a title for your project</span>
                     )}
                   </h1>
                   <button
-                    onClick={() => setEditingSection('title')}
+                    onClick={() => handleOpenSection('title')}
                     className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded-full transition-all"
                     title="Edit title"
                   >
@@ -133,16 +129,18 @@ function Content() {
 
               {/* All Sections */}
               <div className="space-y-2">
-                {formSections.slice(1).map(section => renderSection(section.id))}
+                {Object.keys(sectionMetadata)
+                  .filter(key => key !== 'title')
+                  .map(sectionId => renderSection(sectionId))}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <Modal isOpen={!!editingSection} onClose={() => setEditingSection(null)}>
+      <Modal isOpen={!!editingSection} onClose={handleCloseDialog}>
         <div className="max-h-[85vh] overflow-y-auto">
-          {editingSection && (
+          {editingSection && activeSection && (
             <Section />
           )}
         </div>

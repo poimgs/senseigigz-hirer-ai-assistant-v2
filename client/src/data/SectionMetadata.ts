@@ -1,5 +1,16 @@
 import { Gig } from "../types/gig";
 
+// Define the order of sections for the guided journey
+export const guidedJourneyOrder = [
+  'title',
+  'summary',
+  'deliverables',
+  'skills',
+  'timeline',
+  'budget',
+  'companyBackground'
+] as const;
+
 export type SectionMetadataItem = {
   title: string;
   placeholder: string;
