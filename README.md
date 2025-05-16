@@ -90,7 +90,3 @@ npm start
 1. Fill out the gig description form with your project details
 2. Use the AI chat interface to get help with the overall gig description
 3. Use the AI suggest button to get suggestions for specific sections
-
-## License
-
-MIT
