@@ -1,4 +1,4 @@
-import { GigDescription } from "../types/gig";
+import { Gig } from "../types/gig";
 
 // Define message type for chat interactions
 export type MessageType = {
@@ -11,8 +11,8 @@ export type MessageType = {
 
 // Define the response type for improve section API
 interface ImproveResponse {
-  text: string;
   suggestion: string | null;
+  explanation: string | null;
 }
 
 const apiService = {
@@ -37,9 +37,9 @@ const apiService = {
 
   // Get improvement suggestions for a specific section
   async improveSection(
-    section: string, 
-    content: string, 
-    gigDescription: GigDescription
+    section: string,  
+    gigDescription: Gig,
+    currentSuggestion: string
   ): Promise<ImproveResponse> {
     try {
       const response = await fetch(`${this.baseUrl}/improve`, {
@@ -49,8 +49,8 @@ const apiService = {
         },
         body: JSON.stringify({
           section,
-          content,
           gigDescription,
+          currentSuggestion
         }),
       });
 
@@ -62,14 +62,14 @@ const apiService = {
     } catch (error) {
       console.error('Error calling improve API:', error);
       return {
-        text: 'Sorry, I encountered an error. Please try again later.',
         suggestion: null,
+        explanation: null
       };
     }
   },
 
   // Convert plain text to structured gig description
-  async convertTextToGig(text: string): Promise<GigDescription> {
+  async convertTextToGig(text: string): Promise<Gig> {
     try {
       const response = await fetch(`${this.baseUrl}/convert-text-to-gig`, {
         method: 'POST',

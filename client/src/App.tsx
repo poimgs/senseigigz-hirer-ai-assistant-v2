@@ -1,19 +1,22 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import GigBuilder from './pages/GigBuilder';
 import Home from './pages/Home';
 import Content from './pages/Content';
-import GuidedJourney from './pages/GuidedJourney';
+import InitialGuidedJourney from './pages/InitialGuidedJourney';
+import SectionGuidedJourney from './pages/SectionGuidedJourney';
+import { GigProvider } from './contexts/GigContext';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/gig-builder" element={<GigBuilder />} />
-        <Route path="/content" element={<Content />} />
-        <Route path="/guided-journey" element={<GuidedJourney />} />
-      </Routes>
-    </Router>
+    <GigProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/content" element={<Content />} />
+          <Route path="/guided-journey" element={<InitialGuidedJourney />} />
+          <Route path="/guided-journey/:sectionId" element={<SectionGuidedJourney />} />
+        </Routes>
+      </Router>
+    </GigProvider>
   );
 }
 

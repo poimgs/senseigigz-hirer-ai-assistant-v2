@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { GigDescription } from '../types/gig';
-import { formSections } from '../data/formSections';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -18,43 +15,23 @@ import {
   AlertCircle
 } from 'lucide-react';
 import Section from '../components/Section';
-import { useSuggestions } from '../hooks/useSuggestions';
 import Header from '../components/Header';
 import Modal from '../components/Modal';
-
-interface LocationState {
-  gigDescription?: GigDescription;
-}
+import { useGigOperations } from '../contexts/GigContext';
+import { Gig } from '../types/gig';
+import { sectionMetadata } from '../data/SectionMetadata';
 
 function Content() {
-  const location = useLocation();
-  const state = location.state as LocationState;
-  const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [gigDescriptionState, setGigDescriptionState] = useState<GigDescription>(
-    state?.gigDescription || {
-      title: '',
-      summary: '',
-      companyBackground: '',
-      deliverables: '',
-      skills: '',
-      budget: '',
-      timeline: '',
-      communication: '',
-      ownership: '',
-      confidentiality: '',
-      notes: ''
-    }
-  );
-
-  const {
-    loading,
-    suggestionData,
-    hasActiveSuggestion,
-    generateSuggestion: generateSuggestionBase,
-    handleEnhanceSuggestion: handleEnhanceSuggestionBase,
-    handleAcceptSuggestion: handleAcceptSuggestionBase,
-    handleDismissSuggestion
-  } = useSuggestions();
+  const [editingSection, setEditingSection] = useState<boolean>(false);
+  const [originalContent, setOriginalContent] = useState<string>('');
+  const { 
+    gig, 
+    activeSection, 
+    setActiveSection,
+    setContent,
+    suggestion,
+    handleAcceptSuggestion
+  } = useGigOperations();
 
   const sectionIcons: Record<string, React.ReactNode> = {
     title: <LayoutDashboard className="w-5 h-5" />,
@@ -70,34 +47,31 @@ function Content() {
     notes: <StickyNote className="w-5 h-5" />
   };
 
-  const handleUpdateGigDescription = (section: keyof GigDescription, value: string) => {
-    setGigDescriptionState(prev => ({
-      ...prev,
-      [section]: value
-    }));
+  const handleOpenSection = (section: keyof Gig) => {
+    setEditingSection(true);
+    setActiveSection(section);
+    setOriginalContent(gig[section]);
   };
 
-  const generateSuggestion = (section: keyof GigDescription, content: string) => {
-    generateSuggestionBase(section, content, gigDescriptionState);
+  const handleConfirm = () => {
+    if (suggestion) {
+      handleAcceptSuggestion();
+    }
+    setEditingSection(false);
+    setActiveSection(null);
   };
 
-  const handleEnhanceSuggestion = (section: keyof GigDescription, content: string) => {
-    handleEnhanceSuggestionBase(section, content, gigDescriptionState);
-  };
-
-  const handleAcceptSuggestion = (newContent: string) => {
-    handleAcceptSuggestionBase(newContent, handleUpdateGigDescription);
-  };
-
-  const handleCloseDialog = () => {
-    setEditingSection(null);
+  const handleCancel = () => {
+    setContent(originalContent);
+    setEditingSection(false);
+    setActiveSection(null);
   };
 
   const renderSection = (sectionId: string) => {
-    const section = formSections.find(s => s.id === sectionId);
+    const section = sectionMetadata[sectionId as keyof Gig];
     if (!section) return null;
 
-    const content = gigDescriptionState[sectionId as keyof GigDescription];
+    const content = gig[sectionId as keyof Gig];
     const isEmpty = !content || content.trim() === '';
     const isRequired = section.required;
 
@@ -119,7 +93,7 @@ function Content() {
                 )}
               </div>
               <button
-                onClick={() => setEditingSection(sectionId)}
+                onClick={() => handleOpenSection(sectionId as keyof Gig)}
                 className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded-full transition-all"
                 title="Edit section"
               >
@@ -154,12 +128,12 @@ function Content() {
               <div className="text-center mb-12 pb-8 border-b border-gray-200 group">
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <h1 className="text-3xl font-serif">
-                    {gigDescriptionState.title || (
+                    {gig.title || (
                       <span className="text-gray-400 italic">Add a title for your project</span>
                     )}
                   </h1>
                   <button
-                    onClick={() => setEditingSection('title')}
+                    onClick={() => handleOpenSection('title')}
                     className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded-full transition-all"
                     title="Edit title"
                   >
@@ -170,32 +144,19 @@ function Content() {
 
               {/* All Sections */}
               <div className="space-y-2">
-                {formSections.slice(1).map(section => renderSection(section.id))}
+                {Object.keys(sectionMetadata)
+                  .filter(key => key !== 'title')
+                  .map(sectionId => renderSection(sectionId))}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <Modal isOpen={!!editingSection} onClose={() => setEditingSection(null)}>
+      <Modal isOpen={editingSection} onConfirm={handleConfirm} onClose={handleCancel}>
         <div className="max-h-[85vh] overflow-y-auto">
-          {editingSection && (
-            <Section
-              section={formSections.find(s => s.id === editingSection)!}
-              gigDescription={gigDescriptionState}
-              updateGigDescription={handleUpdateGigDescription}
-              expandedSections={[editingSection]}
-              setExpandedSections={() => {}}
-              toggleOptionalSection={() => {}}
-              suggestion={suggestionData[editingSection]}
-              loading={loading}
-              handleAcceptSuggestion={handleAcceptSuggestion}
-              handleDismissSuggestion={handleDismissSuggestion}
-              generateSuggestion={generateSuggestion}
-              handleEnhanceSuggestion={handleEnhanceSuggestion}
-              hasActiveSuggestion={hasActiveSuggestion}
-              onClose={handleCloseDialog}
-            />
+          {editingSection && activeSection && (
+            <Section />
           )}
         </div>
       </Modal>

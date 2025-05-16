@@ -1,4 +1,4 @@
-export interface GigDescription {
+export interface Gig {
   title: string;
   summary: string;
   companyBackground: string;
@@ -11,3 +11,17 @@ export interface GigDescription {
   confidentiality: string;
   notes: string;
 }
+
+export const INITIAL_GIG: Gig = {
+  title: '',
+  summary: '',
+  companyBackground: '',
+  deliverables: '',
+  skills: '',
+  budget: '',
+  timeline: '',
+  communication: '',
+  ownership: '',
+  confidentiality: '',
+  notes: ''
+};

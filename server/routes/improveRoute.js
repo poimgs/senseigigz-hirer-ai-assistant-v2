@@ -8,11 +8,7 @@ const jobDescriptionSchema = {
   schema: {
     type: "object",
     properties: {
-      section: {
-        type: "string",
-        description: "Name of the job description section being updated."
-      },
-      suggested_update: {
+      suggestion: {
         type: "string",
         description: "AI-generated suggestion or edit for the specified section."
       },
@@ -21,7 +17,7 @@ const jobDescriptionSchema = {
         description: "Brief explanation detailing why the suggestion improves the job description."
       }
     },
-    required: ["section", "suggested_update", "explanation"],
+    required: ["suggestion", "explanation"],
     additionalProperties: false
   }
 };
@@ -61,49 +57,28 @@ The gig description has the following sections:
 const parseAIResponse = (aiResponse) => {
   try {
     const parsedResponse = JSON.parse(aiResponse);
-    if (parsedResponse?.section && parsedResponse?.suggested_update) {
+    if (parsedResponse?.suggestion && parsedResponse?.explanation) {
       return parsedResponse;
     }
   } catch (e) {
     console.error('Error parsing JSON response:', e);
-    
-    // Fallback parsing logic
-    const sectionKeywords = {
-      'title': 'title',
-      'summary': 'summary',
-      'company background': 'companyBackground',
-      'deliverables': 'deliverables',
-      'skills': 'skills',
-      'budget': 'budget',
-      'timeline': 'timeline',
-      'communication': 'communication',
-      'ownership': 'ownership',
-      'confidentiality': 'confidentiality',
-      'notes': 'notes'
-    };
-    
-    const suggestionMatch = aiResponse.match(/```([\s\S]*?)```/);
-    if (suggestionMatch) {
-      const suggestion = suggestionMatch[1].trim();
-      let section = null;
-      
-      for (const [keyword, sectionKey] of Object.entries(sectionKeywords)) {
-        if (aiResponse.toLowerCase().includes(`for ${keyword}`) || 
-            aiResponse.toLowerCase().includes(`${keyword} section`)) {
-          section = sectionKey;
-          break;
-        }
-      }
-      
-      return { section, suggested_update: suggestion };
-    }
+    return null;
   }
   return null;
 };
 
 
 export const improveRoute = asyncHandler(async (req, res) => {
-  const { section, content, gigDescription } = req.body;
+  const { section, gigDescription, currentSuggestion } = req.body;
+
+  let sectionContent = ''
+  if (currentSuggestion) {
+    sectionContent = currentSuggestion;
+  } else if (gigDescription[section]) {
+    sectionContent = gigDescription[section];
+  } else {
+    sectionContent = 'This section is currently empty.';
+  }
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
@@ -111,7 +86,7 @@ export const improveRoute = asyncHandler(async (req, res) => {
       createSystemMessage(gigDescription, section),
       {
         role: 'user',
-        content: `Please improve the ${section} section of my gig description. Here's the current content:\n\n${content || 'This section is currently empty.'}`
+        content: `Please improve the ${section} section of my gig description. Here's the current content:\n\n${sectionContent}`
       }
     ],
     response_format: {
@@ -129,8 +104,7 @@ export const improveRoute = asyncHandler(async (req, res) => {
   const parsedResponse = parseAIResponse(aiResponse);
   
   res.json({
-    text: aiResponse,
-    section: parsedResponse?.section,
-    suggestion: parsedResponse?.suggested_update
+    suggestion: parsedResponse?.suggestion || '',
+    explanation: parsedResponse?.explanation || ''
   });
 });
