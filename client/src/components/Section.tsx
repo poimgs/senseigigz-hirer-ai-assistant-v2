@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { AlertCircle, Edit2 } from 'lucide-react';
 import { Gig } from '../types/gig';
 import { SectionMetadataMap } from '../data/SectionMetadata';
@@ -44,10 +44,14 @@ const Section: React.FC<SectionProps> = ({
             </div>
             <button
               onClick={() => onEditSection(sectionId as keyof Gig)}
-              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded-full transition-all"
-              title="Edit section"
+              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded-full transition-all group relative"
             >
               <Edit2 className="w-4 h-4 text-gray-600" />
+              <div 
+                className="hidden group-hover:block absolute w-48 p-2 bg-gray-800 text-white text-sm text-left rounded shadow-lg z-50 bottom-0 right-0 transform -translate-x-8 group-hover:opacity-100 transition-opacity duration-200"
+              >
+                Edit {section.title}
+              </div>
             </button>
           </div>
           <div className="prose prose-gray max-w-none">

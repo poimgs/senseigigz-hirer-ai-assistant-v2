@@ -32,7 +32,6 @@ const Home: React.FC = () => {
               <h2 className="text-xl font-semibold mb-3">Guided Journey</h2>
               <p className="text-gray-600 mb-4">
                 Let us help you create the perfect gig description with our step-by-step guidance.
-                Ideal for first-time users.
               </p>
               <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors">
                 Start Guided Journey
@@ -47,7 +46,6 @@ const Home: React.FC = () => {
               <h2 className="text-xl font-semibold mb-3">Direct Editor</h2>
               <p className="text-gray-600 mb-4">
                 Jump straight into creating your gig description or upload an existing one.
-                Perfect for experienced users.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 w-full">
                 <button

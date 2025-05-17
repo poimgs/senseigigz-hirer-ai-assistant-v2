@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -87,9 +87,17 @@ function Content() {
                   <button
                     onClick={() => handleOpenSection('title')}
                     className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded-full transition-all"
-                    title="Edit title"
                   >
-                    <Edit2 className="w-4 h-4 text-gray-600" />
+                    <span
+                      className="group relative inline-block"
+                    >
+                      <Edit2 className="w-4 h-4 text-gray-600" />
+                      <div 
+                        className="hidden group-hover:block absolute w-48 p-2 bg-gray-800 text-white text-sm text-left rounded shadow-lg z-50 bottom-0 transform translate-x-6 group-hover:opacity-100 transition-opacity duration-200"
+                      >
+                        Edit project title
+                      </div>
+                    </span>
                   </button>
                 </div>
               </div>
