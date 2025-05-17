@@ -1,125 +1,67 @@
-import { useEffect, useRef, useState } from 'react';
-import { HelpCircle, Sparkles } from 'lucide-react';
-import { useGigOperations } from '../contexts/GigContext';
-import AIAssistant from './AIAssistant';
+import React from 'react';
+import { AlertCircle, Edit2 } from 'lucide-react';
+import { Gig } from '../types/gig';
+import { SectionMetadataMap } from '../data/SectionMetadata';
 
-const Section = () => {
-  const {
-    gig,
-    metadata,
-    suggestion,
-    loading,
-    activeSection,
-    setContent,
-    generateSuggestion
-  } = useGigOperations();
+interface SectionProps {
+  sectionId: string;
+  gig: Gig;
+  sectionMetadata: SectionMetadataMap;
+  sectionIcons: Record<string, React.ReactNode>;
+  onEditSection: (sectionId: keyof Gig) => void;
+}
 
-  if (!activeSection) return null;
+const Section: React.FC<SectionProps> = ({
+  sectionId,
+  gig,
+  sectionMetadata,
+  sectionIcons,
+  onEditSection,
+}) => {
+  const section = sectionMetadata[sectionId as keyof Gig];
+  if (!section) return null;
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const tooltipButtonRef = useRef<HTMLButtonElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    if (activeSection && gig[activeSection] && textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [activeSection, gig]);
+  const content = gig[sectionId as keyof Gig];
+  const isEmpty = !content || content.trim() === '';
+  const isRequired = section.required;
 
-  // Handle tooltip positioning
-  useEffect(() => {
-    const updateTooltipPosition = () => {
-      if (tooltipButtonRef.current && tooltipRef.current) {
-        const rect = tooltipButtonRef.current.getBoundingClientRect();
-        tooltipRef.current.style.setProperty('--tooltip-x', `${rect.left + rect.width / 2}px`);
-        tooltipRef.current.style.setProperty('--tooltip-y', `${rect.top}px`);
-      }
-    };
-    
-    // Update position on mount and window resize
-    updateTooltipPosition();
-    window.addEventListener('resize', updateTooltipPosition);
-    
-    // Clean up event listener on unmount
-    return () => {
-      window.removeEventListener('resize', updateTooltipPosition);
-    };
-  }, []);
   return (
-    <div
-      key={activeSection}
-      className="bg-white p-2 rounded-lg shadow-md max-w-full"
-      data-section={activeSection}
-    >
-      <div className="relative">        
-        <div className="flex items-center gap-2 mb-4">
-          <h2 className="text-2xl font-semibold">{metadata?.title}</h2>
-          <button
-            className="group relative"
-            title={metadata?.description}
-            ref={tooltipButtonRef}
-          >
-            <HelpCircle className="w-5 h-5 text-gray-400" />
-            <div 
-              ref={tooltipRef}
-              className="hidden group-hover:block fixed w-64 p-2 bg-gray-800 text-white text-sm text-left rounded shadow-lg z-50 transform -translate-x-1/2 -translate-y-full group-hover:opacity-100 transition-opacity duration-200"
-                style={{
-                  left: 'var(--tooltip-x, 50%)',
-                  top: 'var(--tooltip-y, 0)',
-                  marginBottom: '10px'
-                }}
-            >
-              {metadata?.description}
-              {metadata?.example && (
-                <div className="mt-2 pt-2 border-t border-gray-700">
-                  <span className="font-semibold">Example:</span>
-                  <p className="text-gray-300 text-xs mt-1 whitespace-pre-line">{metadata?.example}</p>
-                </div>
+    <div className="mb-8 pb-8 border-b border-gray-200 last:border-b-0">
+      <div className="group">
+        <div className="flex-grow">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 flex-grow">
+              {sectionIcons[sectionId]}
+              <h3 className="text-xl font-serif">{section.title}</h3>
+              {isEmpty && isRequired && (
+                <span className="text-sm px-2 py-1 rounded bg-red-50 text-red-600 border border-red-200">
+                  <div className="flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    <span>Required</span>
+                  </div>
+                </span>
               )}
             </div>
-          </button>
-          <button
-            onClick={() => generateSuggestion(activeSection)}
-            className={`group relative p-1.5 rounded-full ${
-              loading || suggestion
-                ? 'text-gray-400 cursor-not-allowed'
-                : 'text-blue-500 hover:bg-blue-50 hover:text-blue-600'
-            } transition-colors ml-auto`}
-            disabled={!!(loading || suggestion)}
-          >
-            <Sparkles size={16} />
-            <span className="absolute right-0 -bottom-8 whitespace-nowrap text-sm bg-gray-800 text-white px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              {!!suggestion ? 'Please resolve the current suggestion first' : 'Improve with AI'}
-            </span>
-          </button>
-        </div>
-        <>
-          <div>
-            <textarea
-              ref={textareaRef}
-              value={gig[activeSection] || ''}
-              onChange={(e) => {
-                const target = e.target;
-                // Auto adjust height on user input
-                target.style.height = 'auto';
-                target.style.height = `${target.scrollHeight}px`;
-                setContent(target.value);
-              }}
-              placeholder={loading ? 'Generating...' : suggestion ? '' : metadata?.placeholder}
-              className={`w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none min-h-[100px] ${
-                loading || !!suggestion ? 'bg-gray-100 cursor-not-allowed' : ''
-              }`}
-              disabled={loading || !!suggestion}
-              style={{ overflow: 'hidden' }}
-            />
+            <button
+              onClick={() => onEditSection(sectionId as keyof Gig)}
+              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-gray-100 rounded-full transition-all"
+              title="Edit section"
+            >
+              <Edit2 className="w-4 h-4 text-gray-600" />
+            </button>
           </div>
-          <div>
-            {(loading || suggestion) && (
-              <AIAssistant />
+          <div className="prose prose-gray max-w-none">
+            {isEmpty ? (
+              <div className={`italic ${isRequired ? 'text-gray-400' : 'text-gray-300'}`}>
+                {isRequired 
+                  ? 'This section requires content. Click the edit button to add details.'
+                  : 'Optional section'}
+              </div>
+            ) : (
+              <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">{content}</div>
             )}
           </div>
-        </>
+        </div>
       </div>
     </div>
   );

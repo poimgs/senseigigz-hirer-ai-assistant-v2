@@ -88,7 +88,7 @@ const AIAssistant = () => {
               e.target.style.height = `${e.target.scrollHeight + 4}px`;
             }}
             placeholder="You can edit this suggestion to better match your needs..."
-            className="w-full text-gray-700 text-sm bg-white p-3 rounded-lg border border-blue-200 shadow-sm whitespace-pre-wrap break-words overflow-auto max-h-64 hover:shadow-md transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none cursor-text"
+            className="w-full text-gray-700 text-sm bg-white p-3 rounded-lg border border-blue-200 shadow-sm whitespace-pre-wrap break-words overflow-auto max-h-64 hover:shadow-md focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none cursor-text"
           />
           <div className="mt-2 text-xs text-gray-500 flex items-center">
             <span className="mr-1">✏️</span>
